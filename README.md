@@ -13,7 +13,7 @@ graph TD
 
     Internet --> IAP
 
-    IAP -->|VNC (GUI)| Kali
+    IAP -->|VNC| Kali
     IAP -->|RDP :3389| WinDC
     IAP -->|RDP :3389| WinClient
     IAP -->|HTTP :8000| Splunk
