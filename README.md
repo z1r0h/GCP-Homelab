@@ -13,7 +13,7 @@ graph TD
 
     Internet --> IAP
 
-    IAP -->|SSH| Kali
+    IAP -->|VNC (GUI)| Kali
     IAP -->|RDP :3389| WinDC
     IAP -->|RDP :3389| WinClient
     IAP -->|HTTP :8000| Splunk
@@ -22,7 +22,7 @@ graph TD
         WinDC["🖥️ win-dc · 10.0.10.10\nAD Domain Controller\nWindows Server 2022"]
         WinClient["💻 win-client · 10.0.10.20\nEmployee Workstation\nWindows Server 2022"]
         Splunk["📊 splunk-server · 10.0.10.50\nSplunk Enterprise\nUbuntu 22.04"]
-        Kali["🐉 kali-attacker · 10.0.10.100\nAttack Machine\nKali Linux"]
+        Kali["🐉 kali-linux-attacker-vm · 10.0.10.3\nAttack Machine\nKali Linux"]
     end
 
     WinClient -->|Join Domain| WinDC
