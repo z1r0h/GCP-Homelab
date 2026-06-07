@@ -56,3 +56,20 @@ When prompted:
 - Password: domain admin password
 
 System reboots automatically after joining.
+
+
+Adding a Team Member
+1. Grant GCP IAM access
+Go to IAM & Admin → Grant Access and assign these two roles to their Gmail:
+
+IAP-secured Tunnel User
+Compute OS Admin Login
+
+2. Create AD user on win-dc (PowerShell as admin)
+powershellNew-ADUser -Name "username" `
+  -SamAccountName "username" `
+  -UserPrincipalName "username@200teamok.local" `
+  -Enabled $true `
+  -AccountPassword (ConvertTo-SecureString "Password123!" -AsPlainText -Force)
+3. Add to Remote Desktop Users on win-client
+powershellAdd-LocalGroupMember -Group "Remote Desktop Users" -Member "200TEAMOK\username"
