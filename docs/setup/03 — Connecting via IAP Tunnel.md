@@ -67,6 +67,3 @@ gcloud compute start-iap-tunnel kali-linux-attacker-vm 5901 --local-host-port=12
 ```
 
 Then connect with any VNC client to `127.0.0.1:5901`.
-
-Add-LocalGroupMember -Group "Remote Desktop Users" -Member "200TEAMOK\username"
-```
