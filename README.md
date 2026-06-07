@@ -6,7 +6,6 @@ A home lab built on GCP to simulate real attacks and practice threat detection u
 
 ## 🖥️ Lab Architecture
 
-Created by [Mermaid Live Editor](https://mermaid.ai/)
 ```mermaid
 ---
 config:
@@ -66,6 +65,8 @@ flowchart TB
 
 All machines are in a private VPC (`security-lab-vpc`) with no public exposure.  
 Access is via **Google IAP Tunnel** only.
+
+Created by [Mermaid Live Editor](https://mermaid.ai/)
 
 ---
 
@@ -129,8 +130,6 @@ ATT&CK Matrix Dashboard
 
 **Splunk Add-on for Sysmon (5709)** — Install first  
 Translates raw Sysmon XML into standardised CIM field names that other apps understand. Without this, Security Essentials rules won't match field names and detection won't work.
-
-> ⚠️ The old Sysmon App (ID 3544) is archived — do not use it. Use 5709 instead.
 
 **Splunk Security Essentials (3435)** — Most important  
 Pre-built detections for all common attack types: brute force, credential dumping, port scan, lateral movement, persistence, C2 beaconing. Each detection is already mapped to a MITRE technique ID and links directly to `attack.mitre.org`. No SPL needed to get started — just enable a rule and the alert is created automatically.
