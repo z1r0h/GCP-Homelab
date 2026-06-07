@@ -120,4 +120,4 @@ All credentials shown in setup docs are lab-only and should never be used in pro
 
 **Jeremy Lim**  
 Cybersecurity Enthusiast | SOC Analyst (aspiring)  
-[LinkedIn](https://linkedin.com/in/your-profile) · [GitHub](https://github.com/z1r0h)
+[LinkedIn](https://www.linkedin.com/in/jeremy-lzh/) · [GitHub](https://github.com/z1r0h)
