@@ -58,18 +58,29 @@ When prompted:
 System reboots automatically after joining.
 
 
-Adding a Team Member
-1. Grant GCP IAM access
-Go to IAM & Admin → Grant Access and assign these two roles to their Gmail:
+## Adding a Team Member
 
-IAP-secured Tunnel User
-Compute OS Admin Login
+### 1. Grant GCP IAM access
 
-2. Create AD user on win-dc (PowerShell as admin)
-powershellNew-ADUser -Name "username" `
+Go to **IAM & Admin → Grant Access** and assign these two roles to their Gmail:
+- `IAP-secured Tunnel User`
+- `Compute OS Admin Login`
+
+### 2. Create AD user on win-dc (PowerShell as admin)
+
+```powershell
+New-ADUser -Name "username" `
   -SamAccountName "username" `
   -UserPrincipalName "username@200teamok.local" `
   -Enabled $true `
   -AccountPassword (ConvertTo-SecureString "Password123!" -AsPlainText -Force)
+```
+
+### 3. Add to Remote Desktop Users on win-client
+
+```powershell
+Add-LocalGroupMember -Group "Remote Desktop Users" -Member "200TEAMOK\username"
+```
+PlainText -Force)
 3. Add to Remote Desktop Users on win-client
 powershellAdd-LocalGroupMember -Group "Remote Desktop Users" -Member "200TEAMOK\username"
