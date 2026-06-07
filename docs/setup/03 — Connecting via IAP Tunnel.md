@@ -3,7 +3,7 @@
 All VMs have no public IP. Access is through Google Identity-Aware Proxy (IAP) tunnel only.
 
 ## Prerequisites
-Download and install [VNC](https://www.realvnc.com/en/connect/download/viewer/windows/) for linux GUI access
+Download and install [VNC](https://www.realvnc.com/en/connect/download/viewer/windows/) for Kali GUI access
 
 Download and install [Google Cloud SDK](https://dl.google.com/dl/cloudsdk/channels/rapid/GoogleCloudSDKInstaller.exe), then authenticate:
 
