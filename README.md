@@ -50,7 +50,7 @@ flowchart TB
     classDef splunk fill:#e6f4ea,stroke:#0f9d58,stroke-width:2px,color:#0b8043
     classDef network fill:#f8f9fa,stroke:#4285f4,stroke-width:1.5px,stroke-dasharray: 5 5
     style AD fill:#eef4ff,stroke:#5a9bfc,stroke-width:1px
-    style GCP fill:#fff8e1,stroke:#2962FF,stroke-width:1.5px,stroke-dasharray: 5 5
+    style GCP fill:#FFF9C4,stroke:transparent,stroke-width:1.5px,stroke-dasharray: 5 5,color:#000000
     linkStyle 1 stroke:#eef4ff,fill:none
     linkStyle 7 stroke:#1a73e8,fill:none
     linkStyle 8 stroke:#D50000,fill:none
