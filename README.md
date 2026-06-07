@@ -115,58 +115,6 @@ This lab is for **educational purposes only**.
 All credentials shown in setup docs are lab-only and should never be used in production.
 
 ---
-```mermaid
-graph TB
-    %% 1. 定义不同角色的颜色主题 (类)
-    classDef internet fill:#e0e0e0,stroke:#9e9e9e,stroke-width:2px,color:#000
-    classDef iap fill:#fbbc04,stroke:#f29900,stroke-width:2px,color:#000
-    classDef attacker fill:#fce8e6,stroke:#ea4335,stroke-width:2px,color:#b31412
-    classDef windows fill:#e8f0fe,stroke:#1a73e8,stroke-width:2px,color:#0d47a1
-    classDef splunk fill:#e6f4ea,stroke:#34a853,stroke-width:2px,color:#0b8043
-
-    %% 2. 外部网络与入口
-    Internet(("🌐 Internet")):::internet
-    IAP["🔒 Google IAP Tunnel<br>35.235.240.0/20"]:::iap
-
-    Internet --> IAP
-
-    %% 3. GCP VPC 内部架构
-    subgraph GCP ["☁️ GCP — security-lab-vpc (10.0.10.0/24)"]
-        direction TB
-        
-        Kali["🐉 kali-linux-attacker-vm<br>10.0.10.3<br>Kali Linux"]:::attacker
-
-        %% 将 Windows 机器归类到 AD 环境中，逻辑更紧凑
-        subgraph AD ["🏢 Active Directory Environment"]
-            direction LR
-            WinDC["🖥️ win-dc<br>10.0.10.10<br>AD Domain Controller"]:::windows
-            WinClient["💻 win-client<br>10.0.10.20<br>Employee Workstation"]:::windows
-        end
-
-        Splunk["📊 splunk-server<br>10.0.10.50<br>Splunk Enterprise"]:::splunk
-    end
-
-    %% 4. 设置 Subgraph (背景框) 的样式
-    style GCP fill:#f8f9fa,stroke:#4285f4,stroke-width:2px,stroke-dasharray: 5 5
-    style AD fill:#ffffff,stroke:#8ab4f8,stroke-width:1px
-
-    %% 5. IAP 远程访问连接 (使用虚线 -.-> 表示管理连接)
-    IAP -.->|VNC| Kali
-    IAP -.->|RDP :3389| WinDC
-    IAP -.->|RDP :3389| WinClient
-    IAP -.->|HTTP :8000| Splunk
-
-    %% 6. 内部正常业务流量 (使用常规双向线 <-->)
-    WinClient <-->|Join Domain| WinDC
-
-    %% 7. 日志转发流量 (使用虚线 -.-> 表示后台数据流)
-    WinDC -.->|Sysmon logs :9997| Splunk
-    WinClient -.->|Sysmon logs :9997| Splunk
-
-    %% 8. 攻击流量 (使用加粗线条 ==> 突出显示)
-    Kali ==>|Attack Traffic| WinDC
-    Kali ==>|Attack Traffic| WinClient
-```
 
 ## 📜 Author
 
