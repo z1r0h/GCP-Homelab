@@ -115,55 +115,8 @@ This lab is for **educational purposes only**.
 All credentials shown in setup docs are lab-only and should never be used in production.
 
 ---
+<img width="2212" height="572" alt="image" src="https://github.com/user-attachments/assets/7ef0b3f0-be18-45e7-8e1f-029766cf7c87" />
 
-```mermaid
-graph TB
-    %% 定义颜色主题
-    classDef internet fill:#e0e0e0,stroke:#9e9e9e,stroke-width:2px,color:#000
-    classDef iap fill:#fbbc04,stroke:#f29900,stroke-width:2px,color:#000
-    classDef attacker fill:#fce8e6,stroke:#ea4335,stroke-width:2px,color:#b31412
-    classDef windows fill:#e8f0fe,stroke:#1a73e8,stroke-width:2px,color:#0d47a1
-    classDef splunk fill:#e6f4ea,stroke:#34a853,stroke-width:2px,color:#0b8043
-
-    %% 外部入口
-    Internet(("🌐 Internet")):::internet
-    IAP["🔒 Google IAP Tunnel<br>35.235.240.0/20"]:::iap
-
-    Internet --> IAP
-
-    %% 内部 GCP 环境
-    subgraph GCP ["☁️ GCP — security-lab-vpc (10.0.10.0/24)"]
-        direction TB
-        
-        Kali["🐉 kali-linux-attacker-vm<br>10.0.10.3<br>Attack Machine<br>Kali Linux"]:::attacker
-
-        subgraph AD ["🏢 Active Directory Environment"]
-            direction TB
-            WinClient["💻 win-client<br>10.0.10.20<br>Employee Workstation<br>Windows Server 2022"]:::windows
-            WinDC["🖥️ win-dc<br>10.0.10.10<br>AD Domain Controller<br>Windows Server 2022"]:::windows
-        end
-
-        Splunk["📊 splunk-server<br>10.0.10.50<br>Splunk Enterprise<br>Ubuntu 22.04"]:::splunk
-    end
-
-    style GCP fill:#f8f9fa,stroke:#4285f4,stroke-width:2px,stroke-dasharray: 5 5
-    style AD fill:#ffffff,stroke:#8ab4f8,stroke-width:1px
-
-    %% IAP 访问连线 (虚线)
-    IAP -.->|VNC| Kali
-    IAP -.->|RDP :3389| WinClient
-    IAP -.->|RDP :3389| WinDC
-    IAP -.->|HTTP :8000| Splunk
-
-    %% 业务与日志连线
-    WinClient <-->|Join Domain| WinDC
-    WinClient -.->|Sysmon logs :9997| Splunk
-    WinDC -.->|Sysmon logs :9997| Splunk
-
-    %% 攻击流量连线 (粗体红色)
-    Kali ==>|Attack Traffic| WinClient
-    Kali ==>|Attack Traffic| WinDC
-```
 
 ## 📜 Author
 
