@@ -81,6 +81,4 @@ New-ADUser -Name "username" `
 ```powershell
 Add-LocalGroupMember -Group "Remote Desktop Users" -Member "200TEAMOK\username"
 ```
-PlainText -Force)
-3. Add to Remote Desktop Users on win-client
-powershellAdd-LocalGroupMember -Group "Remote Desktop Users" -Member "200TEAMOK\username"
+
