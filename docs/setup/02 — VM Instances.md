@@ -9,7 +9,7 @@ All VMs are in region `asia-southeast1`, zone `asia-southeast1-a`, on the `secur
 | `win-dc` | `10.0.10.10` | Windows Server 2022 | AD Domain Controller |
 | `win-client` | `10.0.10.20` | Windows Server 2022 | Employee Workstation |
 | `splunk-server` | `10.0.10.50` | Ubuntu 22.04 | Splunk SIEM |
-| `kali-linux-attacker-vm` | `10.0.10.100` | Kali Linux | Attack Machine |
+| `kali-linux-attacker-vm` | `10.0.10.3` | Kali Linux | Attack Machine |
 
 ---
 
