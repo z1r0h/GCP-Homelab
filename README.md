@@ -1,6 +1,25 @@
 # 🛡️ Splunk Threat Detection Lab
 
-A home lab built on GCP to simulate real attacks and practice threat detection using Splunk SIEM.
+A hands-on adversarial simulation lab built on GCP to practice threat detection, log analysis, and SOC workflows using Splunk SIEM and a real Active Directory environment.
+
+🎯 Purpose
+This lab was built to bridge the gap between certification knowledge and real-world SOC work.
+What this lab practices:
+
+Simulating real attacker techniques using Kali Linux (MITRE ATT&CK mapped)
+Writing custom Splunk SPL detection rules from scratch
+Understanding how logs flow from endpoint → forwarder → SIEM → alert
+Investigating alerts the same way a SOC Analyst would on the job
+
+What this lab demonstrates:
+
+Hands-on experience with Sysmon telemetry and Windows Event Logs
+Detection engineering — not just consuming alerts, but building them
+Active Directory attack surface awareness (credential abuse, lateral movement, persistence)
+Documentation discipline — every attack scenario recorded with commands, SPL, and findings
+
+
+This lab is intentionally kept close to entry-level SOC reality: Sysmon-based endpoint detection without a firewall or IDS, reflecting what many organisations actually rely on. Limitations are documented honestly in each attack scenario.
 
 ---
 
