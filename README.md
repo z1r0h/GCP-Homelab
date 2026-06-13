@@ -34,7 +34,7 @@ A 4-VM private VPC (no public IPs — access via IAP tunnelling):
 | Splunk Enterprise | SIEM |
 | Kali Linux | Attacker box |
 
-**Telemetry pipeline:** Sysmon (SwiftOnSecurity config) → Splunk Universal Forwarder → Splunk Enterprise
+**Telemetry pipeline:** Sysmon (**sysmon-modular** config) → Splunk Universal Forwarder → Splunk Enterprise
 
 ### What's built 🟢
 
