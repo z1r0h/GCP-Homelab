@@ -180,7 +180,7 @@ Follow in order. Steps 1–5 build the environment; **step 6 is the key one-time
 | 07 | [VM Backup & Recovery](docs/setup/07%20—%20VM%20Backup%20%26%20Recovery.md) |
 
 ---
-## 🔴 Attack Scenarios (Coming Soon)
+## 🔴 Attack Scenarios
 
 Run from `attacks/`, detect with `detection/`. Click through for commands, SPL, and alert settings.
 
@@ -213,7 +213,7 @@ Run from `attacks/`, detect with `detection/`. Click through for commands, SPL, 
 
 ---
 
-## 🔵 Detection (Coming Soon)
+## 🔵 Detection
 
 Each attack scenario has a matching Splunk SPL query and alert rule documented in [`detection/`](detection/).
  
