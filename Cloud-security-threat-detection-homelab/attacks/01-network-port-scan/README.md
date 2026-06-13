@@ -50,6 +50,6 @@ Full SPL and alert settings: [detection/01-network-port-scan.md](../../detection
 
 ## Screenshots
 
-- `screenshots/01-nmap-output.png`
-- `screenshots/02-splunk-eventcode3.png`
-- `screenshots/03-alert-triggered.png`
+- (screenshots/01-nmap-output.png)
+- screenshots/02-splunk-eventcode3.png
+- screenshots/03-alert-triggered.png
