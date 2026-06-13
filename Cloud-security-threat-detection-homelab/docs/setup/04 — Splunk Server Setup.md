@@ -65,7 +65,6 @@ Install the following apps via **Apps → Find More Apps**. Install in this exac
 | 1 | Splunk Add-on for Sysmon | [5709](https://splunkbase.splunk.com/app/5709) | Parses Sysmon XML into searchable fields (EventCode, SourceIp, CommandLine, etc.) |
 | 2 | Splunk Add-on for Microsoft Windows | [742](https://splunkbase.splunk.com/app/742) | Parses native Windows Event Log fields (EventCode 4625, 4720, 4698, etc.) |
 | 3 | Splunk Security Essentials | [3435](https://splunkbase.splunk.com/app/3435) | SPL reference library and detection rule templates mapped to MITRE ATT&CK |
-| 4 | MITRE ATT&CK App for Splunk | [4617](https://splunkbase.splunk.com/app/4617) | Visual ATT&CK matrix heatmap — lights up techniques based on your alert hits |
 
 > ⚠️ The old Sysmon App (ID 3544) is archived — do not use it. Use 5709 instead.
 
@@ -82,8 +81,6 @@ Security Essentials is a detection rule library, not an automatic alert system. 
 - Copy and adapt SPL queries for your own alerts
 - Understand what data sources each detection needs
 
-**App 4 — Portfolio visualisation**
-The ATT&CK matrix populates based on alerts you build yourself. After a port scan alert fires, T1046 (Discovery) lights up on the matrix. Useful for demonstrating detection coverage.
 
 ### Important: Alerts must be built manually
 
