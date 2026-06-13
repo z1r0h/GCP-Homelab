@@ -187,7 +187,7 @@ Run from `attacks/`, detect with `detection/`. Click through for commands, SPL, 
 ### 🟢 Beginner
 | # | Scenario | Technique | Status |
 |---|---|---|---|
-| 01 | [Network Port Scan](attacks/01-network-port-scan/README.md) | T1046 | 🔜 |
+| 01 | [Network Port Scan](attacks/01-network-port-scan/README.md) | T1046 | ✅ |
 | 02 | [RDP Brute Force](attacks/02-rdp-brute-force/README.md) | T1110.001 | 🔜 |
 | 03 | [PowerShell Download Cradle](attacks/03-powershell-cradle/README.md) | T1059.001 | 🔜 |
 | 04 | [Rogue Local User Creation](attacks/04-rogue-user/README.md) | T1136.001 | 🔜 |
@@ -222,7 +222,6 @@ Detection flow for every scenario:
 2. Sysmon captures event on victim VM
 3. Splunk Universal Forwarder sends log to `splunk-server`
 4. Security Essentials rule fires and creates alert
-5. MITRE ATT&CK App matrix highlights the technique
 
 ---
 
