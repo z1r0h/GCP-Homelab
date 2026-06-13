@@ -54,8 +54,8 @@ All scenarios run against the baseline configured in [setup 06](../docs/setup/06
 3. Confirm events in Splunk (search from detection/NN-name.md)
 4. Save As → Alert (settings in detection file)
 5. Trigger again → check Activity → Triggered Alerts
-6. Screenshot: attack, events, alert, MITRE matrix
-7. Fill in Findings table + flip status 🔜 → ✅
+6. Screenshot: attack, events, alert
+7. Fill in Findings table + flip status 🔜 → ✅ Completed
 8. If "Restore After" = Yes:  ./scripts/recovery/restore.sh win-client
 ```
 
