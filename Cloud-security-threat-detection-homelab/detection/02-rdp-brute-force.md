@@ -2,7 +2,7 @@
 
 | Field | Detail |
 |---|---|
-| Status | 🔜 Pending |
+| Status | ✅ Completed |
 | MITRE Technique | [T1110.001 — Brute Force: Password Guessing](https://attack.mitre.org/techniques/T1110/001/) |
 | MITRE Tactic | Credential Access |
 | Log Source | Windows Security Event 4625 |
