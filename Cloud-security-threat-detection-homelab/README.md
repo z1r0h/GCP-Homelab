@@ -193,7 +193,7 @@ Run from `attacks/`, detect with `detection/`. Click through for commands, SPL, 
 ### 🟡 Intermediate
 | # | Scenario | Technique | Status |
 |---|---|---|---|
-| 05 | [Credential Dumping (Mimikatz)](attacks/05-credential-dumping/README.md) | T1003.001 | 🔜 |
+| 05 | [Credential Dumping (Mimikatz)](attacks/05-credential-dumping/README.md) | T1003.001 | ✅ |
 | 06 | [Pass-the-Hash](attacks/06-pass-the-hash/README.md) | T1550.002 | 🔜 |
 | 07 | [Scheduled Task Persistence](attacks/07-scheduled-task/README.md) | T1053.005 | 🔜 |
 | 08 | [SMB Share Enumeration](attacks/08-smb-enumeration/README.md) | T1135 | 🔜 |
