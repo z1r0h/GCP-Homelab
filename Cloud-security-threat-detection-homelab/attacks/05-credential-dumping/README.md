@@ -5,7 +5,7 @@
 | Field             | Detail                                                                                            |
 | ----------------- | ------------------------------------------------------------------------------------------------- |
 | Status            | ✅ Completed                                                                                       |
-| Date              | —                                                                                                 |
+| Date              | 14 June 2026                                                                                                |
 | Tier              | Intermediate                                                                                      |
 | Attacker workflow | Run mimikatz on win-client to dump LSASS                                                          |
 | Target            | win-client (10.0.10.20)                                                                           |
