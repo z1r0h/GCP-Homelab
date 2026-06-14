@@ -13,7 +13,7 @@
 ## SPL Query
 Check for failed Login
 ```spl
-index=* EventCode=4625 source="XmlWinEventLog:Security"
+index=* EventCode=4625 source="XmlWinEventLog:Security" src_ip="10.0.10.3"
 | bucket _time span=1m
 | stats count as failed_logons by _time, src_ip
 | where failed_logons > 3
@@ -28,19 +28,29 @@ index=* EventCode=4624 source="XmlWinEventLog:Security" src_ip="10.0.10.3"
 | sort _time
 ```
 
+Create Detection Alert
+```spl
+index=* EventCode=4625 source="XmlWinEventLog:Security"
+| bucket _time span=1m
+| stats count as failed_logons by _time, src_ip
+| where failed_logons > 3
+| eval mitre_technique="T1110.001", mitre_tactic="Credential Access"
+```
+
 ---
 
 ## Alert Settings
 
 | Field      | Value                                        |
 | ---------- | -------------------------------------------- |
-| Title      | `Credential Access - T1110.001`              |
+| Title      | `RDP Brute Force - T1110.001`                |
 | Alert Type | Scheduled — Cron `*/5 * * * *` (every 5 min) |
 | Time range | Last 5 minutes                               |
-| Trigger    | Number of Results > 1                        |
+| Trigger    | Number of Results > 0                        |
 | Throttle   | Off                                          |
 | Expires    | 24 hours                                     |
 | Action     | Add to Triggered Alerts                      |
+
 
 ---
 
