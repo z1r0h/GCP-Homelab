@@ -160,8 +160,6 @@ Required alongside 5709. Enables correct parsing of native Windows Event Log fie
 **Splunk Security Essentials (3435)** — SPL reference  
 A library of 900+ detection templates mapped to MITRE ATT&CK. Use it to understand how detections are structured, what data sources they need, and how to write your own SPL. Not an auto-alerting system.
  
-**MITRE ATT&CK App for Splunk (4617)** — Install last  
-Renders a live ATT&CK matrix heatmap. After a port scan alert fires, T1046 (Network Service Discovery) lights up under the Discovery tactic. Clicking any cell links directly to `attack.mitre.org`.
  
 ---
 
