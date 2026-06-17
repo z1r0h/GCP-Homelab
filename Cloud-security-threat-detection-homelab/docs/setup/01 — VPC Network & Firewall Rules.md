@@ -28,7 +28,7 @@ Go to **VPC Network → Firewall** and create 2 rules:
 | Targets | All instances in the network |
 | Source filter | IPv4 ranges |
 | Source IPv4 ranges | `35.235.240.0/20` |
-| Protocols and ports | TCP: `22, 3389, 8000` |
+| Protocols and ports | TCP: `22, 3389, 5901, 8000` |
 
 ### Rule 2 — Allow Internal Traffic
 
@@ -74,7 +74,7 @@ gcloud compute firewall-rules create allow-iap-ingress \
     --network=security-lab-vpc \
     --direction=INGRESS \
     --action=ALLOW \
-    --rules=tcp:22,tcp:3389,tcp:8000 \
+    --rules=tcp:22,tcp:3389,tcp:5901,tcp:8000 \
     --source-ranges=35.235.240.0/20
 
 # 4. Create Firewall Rule 2: Allow Internal Traffic

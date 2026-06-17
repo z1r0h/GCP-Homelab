@@ -61,7 +61,9 @@ All VMs are in region `asia-southeast1`, zone `asia-southeast1-a`, on the `secur
 
 ### Auto-start VNC on boot
 
-SSH into Kali and run:
+SSH into Kali. Run the three steps below in order.
+
+**Step 1 — Create the service file** (paste the whole block as one command):
 
 ```bash
 sudo tee /etc/systemd/system/vncserver.service <<EOF
@@ -82,10 +84,20 @@ ExecStop=/usr/bin/vncserver -kill :1
 [Install]
 WantedBy=multi-user.target
 EOF
-------------------------------------------------(next)
+```
+
+**Step 2 — Reload systemd and enable the service:**
+
+```bash
 sudo systemctl daemon-reload
 sudo systemctl enable vncserver.service
-------------------------------------------------(next)
+```
+
+**Step 3 — Start it and confirm it's running:**
+
+```bash
 sudo systemctl start vncserver.service
 sudo systemctl status vncserver.service
 ```
+
+> Set a VNC password first if you haven't: run `vncserver` once interactively, set the password, then `vncserver -kill :1` before enabling the service.

@@ -5,26 +5,34 @@
 SSH into `splunk-server` and run:
 
 ```bash
-# Download Splunk
-wget -O splunk-10.4.0-linux-amd64.deb \
+# Download Splunk (check splunk.com for the current version/build string)
+wget -O splunk.deb \
   "https://download.splunk.com/products/splunk/releases/10.4.0/linux/splunk-10.4.0-f798d4d49089-linux-amd64.deb"
 
-# Install
-sudo dpkg -i splunk-10.4.0-linux-amd64.deb
+# Install (extracts to /opt/splunk)
+sudo dpkg -i splunk.deb
 
-# First start (creates admin account)
-sudo /opt/splunk/bin/splunk start --accept-license --run-as-root
-
-# Create splunk user and transfer ownership
+# Create the dedicated splunk user (best practice — do NOT run as root)
 sudo useradd -m splunk
 sudo chown -R splunk:splunk /opt/splunk
 
-# Enable auto-start on boot
-sudo /opt/splunk/bin/splunk enable boot-start -user splunk
+# First start as the splunk user — accepts license and creates the admin account
+sudo -u splunk /opt/splunk/bin/splunk start --accept-license
 
-# Check status
-sudo systemctl status splunk
+# Stop it again so we can enable boot-start under systemd
+sudo -u splunk /opt/splunk/bin/splunk stop
+
+# Enable boot-start as a systemd service owned by the splunk user
+sudo /opt/splunk/bin/splunk enable boot-start -user splunk -systemd-managed 1
+
+# Start via systemd and check status
+sudo systemctl start Splunkd
+sudo systemctl status Splunkd
 ```
+
+> The systemd service is named `Splunkd` by default. If your version names it differently, run `systemctl list-units | grep -i splunk` to confirm.
+
+> ⚠️ Do **not** use `--run-as-root`. Running Splunk as root and then enabling boot-start as the `splunk` user causes file-ownership/PID conflicts and the service fails to start on boot.
 
 ---
 
@@ -36,6 +44,8 @@ Open IAP tunnel then go to `http://localhost:8000`
 gcloud compute start-iap-tunnel splunk-server 8000 --local-host-port=127.0.0.1:8000 --zone=asia-southeast1-a
 ```
 
+First login uses the admin account created during the first start.
+
 ---
 
 ## Activate License
@@ -43,6 +53,15 @@ gcloud compute start-iap-tunnel splunk-server 8000 --local-host-port=127.0.0.1:8
 1. Go to **Settings → Licensing**
 2. Click **Add License**
 3. Upload your Developer license file
+4. Restart when prompted: `sudo systemctl restart Splunkd`
+
+---
+
+## Create the Index
+
+**Settings → Indexes → New Index**
+- Index name: `wineventlog`
+- Leave defaults → Save
 
 ---
 
@@ -60,11 +79,17 @@ Splunk is now ready to receive logs from Windows forwarders.
 
 Install the following apps via **Apps → Find More Apps**. Install in this exact order:
 
-| Order | App | Splunkbase ID | Role |
-|---|---|---|---|
-| 1 | Splunk Add-on for Sysmon | [5709](https://splunkbase.splunk.com/app/5709) | Parses Sysmon XML into searchable fields (EventCode, SourceIp, CommandLine, etc.) |
-| 2 | Splunk Add-on for Microsoft Windows | [742](https://splunkbase.splunk.com/app/742) | Parses native Windows Event Log fields (EventCode 4625, 4720, 4698, etc.) |
-| 3 | Splunk Security Essentials | [3435](https://splunkbase.splunk.com/app/3435) | SPL reference library and detection rule templates mapped to MITRE ATT&CK |
+| Order | App                                 | Splunkbase ID                                  | Role                                                                              |
+| ----- | ----------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------- |
+| 1     | Splunk Add-on for Sysmon            | [5709](https://splunkbase.splunk.com/app/5709) | Parses Sysmon XML into searchable fields (EventCode, SourceIp, CommandLine, etc.) |
+| 2     | Splunk Add-on for Microsoft Windows | [742](https://splunkbase.splunk.com/app/742)   | Parses native Windows Event Log fields (EventCode 4625, 4720, 4698, etc.)         |
+| 3     | Splunk Security Essentials          | [3435](https://splunkbase.splunk.com/app/3435) | SPL reference library and detection rule templates mapped to MITRE ATT&CK         |
+
+
+Restart Splunk after installing all apps:
+```bash
+sudo systemctl restart Splunkd
+```
 
 > ⚠️ The old Sysmon App (ID 3544) is archived — do not use it. Use 5709 instead.
 

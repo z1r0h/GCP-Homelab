@@ -35,6 +35,27 @@ The system will reboot automatically. After reboot, login with:
 
 ---
 
+## Create Test Accounts (used by attack scenarios)
+
+After reboot, RDP back into win-dc and create the accounts that later scenarios rely on:
+
+```powershell
+# Regular user (used in Kerberoasting request, lateral movement, etc.)
+New-ADUser -Name "jsmith" -SamAccountName "jsmith" `
+  -UserPrincipalName "jsmith@200teamok.local" `
+  -AccountPassword (ConvertTo-SecureString "Passw0rd123!" -AsPlainText -Force) `
+  -Enabled $true
+
+# Service account with SPN (target for Kerberoasting — scenario 10)
+New-ADUser -Name "svc-sql" -SamAccountName "svc-sql" `
+  -UserPrincipalName "svc-sql@200teamok.local" `
+  -AccountPassword (ConvertTo-SecureString "Service123!" -AsPlainText -Force) `
+  -Enabled $true
+setspn -A MSSQLSvc/sql.200teamok.local:1433 svc-sql
+```
+
+---
+
 ## Join win-client to Domain
 
 Connect to `win-client` via RDP, open **PowerShell as Administrator**:
@@ -56,6 +77,8 @@ When prompted:
 - Password: domain admin password
 
 System reboots automatically after joining.
+
+> **GCP DNS note:** GCP pushes its own DNS server via DHCP, which can overwrite the manual DNS setting on reboot and break domain login. To make it stick, the robust fix is to set win-dc (`10.0.10.10`) as the DNS server for the **subnet/VPC** — or, simpler for a lab, re-run the `Set-DnsClientServerAddress` command if the client ever loses the domain after a reboot. If domain join fails at step 3 with a DNS error, confirm `nslookup 200teamok.local` returns `10.0.10.10` first.
 
 
 ## Adding a Team Member
@@ -81,4 +104,3 @@ New-ADUser -Name "username" `
 ```powershell
 Add-LocalGroupMember -Group "Remote Desktop Users" -Member "200TEAMOK\username"
 ```
-
