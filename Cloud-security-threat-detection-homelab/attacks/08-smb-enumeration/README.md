@@ -48,5 +48,8 @@ Full SPL, alert settings, and notes are in the [detection file](../../detection/
 
 ## Screenshots
 
-
+![](screenshots/1-enum4linux.png) 
+![](screenshots/2-eventcode.png) 
+![](screenshots/3-create-alert.png) 
+![](screenshots/4-alert-triggered.png)
 
