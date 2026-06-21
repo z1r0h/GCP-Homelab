@@ -35,7 +35,6 @@ Full SPL, alert settings, and notes are in the [detection file](../../detection/
 
 ## Findings
 
-> *(Fill in after completing the exercise)*
 
 | Field           | Result                                                     |
 | --------------- | ---------------------------------------------------------- |
