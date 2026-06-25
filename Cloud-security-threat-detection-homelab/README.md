@@ -198,7 +198,7 @@ Run from `attacks/`, detect with `detection/`. Click through for commands, SPL, 
 | 07 | [Scheduled Task Persistence](attacks/07-scheduled-task/README.md) | T1053.005 | ✅ |
 | 08 | [SMB Share Enumeration](attacks/08-smb-enumeration/README.md) | T1135 | ✅ |
 | 09 | [Registry Run Key Persistence](attacks/09-registry-run-key/README.md) | T1547.001 | ✅ |
-| 10 | [Kerberoasting](attacks/10-kerberoasting/README.md) | T1558.003 | 🔜 |
+| 10 | [Kerberoasting](attacks/10-kerberoasting/README.md) | T1558.003 | ✅ |
 
 ### 🔴 Advanced
 | # | Scenario | Technique | Status |
