@@ -204,7 +204,7 @@ Run from `attacks/`, detect with `detection/`. Click through for commands, SPL, 
 | # | Scenario | Technique | Status |
 |---|---|---|---|
 | 11 | [C2 Beacon Simulation](attacks/11-c2-beacon/README.md) | T1071 | ✅ |
-| 12 | [DCSync Attack](attacks/12-dcsync/README.md) | T1003.006 | 🔜 |
+| 12 | [DCSync Attack](attacks/12-dcsync/README.md) | T1003.006 | ✅ |
 | 13 | [Golden Ticket](attacks/13-golden-ticket/README.md) | T1558.001 | 🔜 |
 | 14 | [Full APT Attack Chain](attacks/14-apt-chain/README.md) | Multiple | 🔜 |
 
