@@ -188,5 +188,16 @@ AI-Security-Lab/
 | 19 | LLM Misinformation & Hallucination Defense| 🟣 Both | OWASP LLM09 | ⚪ PLANNED |
 | 20 | AI vs AI Final Exercise | 🟣 Both | ALL Frameworks | ⚪ PLANNED |
 
-## 📄 License
-MIT License — For educational, training, and authorized security testing purposes only.
+## ⚠️ Disclaimer
+
+This lab is for **educational purposes only**.  
+All credentials shown in setup docs are lab-only and should never be used in production.
+
+---
+
+
+## 📜 Author
+
+**Jeremy Lim**  
+Cybersecurity Enthusiast | SOC Analyst (aspiring)  
+[LinkedIn](https://www.linkedin.com/in/jeremy-lzh/) · [GitHub](https://github.com/z1r0h)
