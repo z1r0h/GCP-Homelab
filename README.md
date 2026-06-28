@@ -18,6 +18,30 @@ This repo is an umbrella for several labs. Each lab has its own folder with setu
 
 ---
 
+### AI Security Lab
+A comprehensive hybrid lab focusing on the intersection of AI and Cybersecurity. It features 20 hands-on scenarios covering offensive AI, defensive AI, and AI/ML vulnerabilities, bridging local GPU-accelerated workloads with cloud-based SIEM analysis.
+Architecture
+A hybrid environment prioritizing local execution for heavy AI inference tasks (GPU utilization) while securely routing telemetry to the GCP Cloud SIEM via IAP Tunnels:
+
+| Component | Role |
+| :--- | :--- |
+| Kali Linux & GoPhish | Offensive toolkit for AI-powered attacks and social engineering (Red Net) |
+| Vulnerable AI Apps | Custom targets (llm-app, rag-app, agent-app) built to practice prompt injection, data poisoning, and more |
+| Ollama Server (RTX 5060) | Local AI backend running Llama 3 models entirely offline |
+| Wazuh & Sysmon | Local defense layer for EDR, endpoint monitoring, and log aggregation |
+| Splunk Enterprise (GCP) | Cloud SIEM for threat hunting, securely ingesting logs via GCP IAP & Splunk HEC |
+
+### What's built 🟡
+- 20 distinct hands-on scenarios spanning Offensive AI (autonomous pentesting), Defensive AI (SOC alert triage, SOAR), and AI Vulnerability Exploitation.
+- Custom-built vulnerable AI applications (llm-app, rag-app, agent-app).
+- Secure end-to-end telemetry pipeline routing Wazuh JSON alerts over GCP IAP Tunnels (port 8088) directly into Splunk HEC.
+- Splunk Web UI accessible securely via IAP Tunnels (port 8000) without exposing public IPs.
+- Lab scenarios mapped against MITRE ATT&CK, MITRE ATLAS, and OWASP LLM Top 10 frameworks.
+Tools & Tech
+Ollama (Llama 3 / CodeLlama) · Python · Docker · Wazuh · Sysmon · Splunk Enterprise · GCP IAP Tunnels · Kali Linux · GoPhish · MITRE ATLAS · OWASP LLM Top 10
+
+---
+
 ## Cloud Security Threat Detection Homelab
 
 A small enterprise-style environment on GCP for simulating attacks and building the matching detections in Splunk.
