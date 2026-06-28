@@ -75,21 +75,24 @@ flowchart LR
 To securely transmit logs from the local lab to GCP without exposing Splunk to the public internet, the lab uses GCP IAP (Identity-Aware Proxy) Tunnels and Splunk HEC (HTTP Event Collector).
 
 ```mermaid
+---
+config:
+  theme: redux-dark-color
+  look: handDrawn
+  fontFamily: '''Merriweather Variable'', serif'
+---
 sequenceDiagram
     participant Docker as Local Docker (Wazuh/Apps)
     participant IAP as GCP IAP Tunnel (Localhost:8088)
     participant HEC as Splunk HEC (GCP VM:8088)
     participant Splunk as Splunk Indexer (GCP)
-    
     Note over Docker, Splunk: Log Ingestion Pipeline
     Docker->>IAP: 1. Send JSON log via HTTP POST (localhost:8088)
     IAP->>HEC: 2. Securely tunnel traffic to GCP internal IP
     HEC->>Splunk: 3. Authenticate via Token & Ingest to Index
-    
     participant Analyst as SOC Analyst (Browser)
     participant IAPWeb as GCP IAP Tunnel (Localhost:8000)
     participant Web as Splunk Web (GCP VM:8000)
-    
     Note over Analyst, Web: Analysis Pipeline
     Analyst->>IAPWeb: 4. Access Splunk UI (https://localhost:8000)
     IAPWeb->>Web: 5. Securely tunnel UI traffic
