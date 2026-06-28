@@ -20,47 +20,54 @@ The lab utilizes a hybrid architecture, prioritizing local execution for heavy A
 ### Overall Architecture
 
 ```mermaid
-graph TD
-    subgraph "🖥️ Local Machine (Windows 11 + WSL2/Docker)"
-        subgraph "🔵 Blue Net (Defense)"
-            W[Wazuh SIEM]
-            A[AI SOC Analyst Script]
-        end
-        
-        subgraph "🔴 Red Net (Attack)"
-            K[Kali Linux]
-            C[CALDERA]
-            G[GoPhish]
-        end
-        
-        subgraph "🎯 Target Net (Vulnerable Apps)"
-            D[DVWA & JuiceShop]
-            L[Vulnerable LLM App]
-            R[Vulnerable RAG App]
-        end
-        
-        subgraph "🤖 AI Native (GPU Hardware)"
-            O[Ollama Server - RTX 5060]
-        end
-        
-        K -->|Attacks| D
-        K -->|Attacks| L
-        K -->|Attacks| R
-        A -->|Queries| O
-        L -->|Uses| O
-        W -.->|Monitors| D
-        W -.->|Monitors| L
-    end
-
-    subgraph "☁️ GCP Environment"
-        S[Splunk Enterprise]
-        AD[Windows AD DC]
-        WC[Windows Client]
-    end
-
-    W == "Logs & Alerts" ==> S
-    AD == "WinEventLog" ==> S
-    WC == "Sysmon" ==> S
+---
+config:
+  theme: neo-dark
+  layout: elk
+---
+flowchart LR
+ subgraph subGraph0["🔵 Blue Net (Defense)"]
+        W["Wazuh SIEM"]
+        A["AI SOC Analyst Script"]
+        SysmonLocal["Local Sysmon"]
+  end
+ subgraph subGraph1["🔴 Red Net (Attack)"]
+        K["Kali Linux"]
+        C["CALDERA"]
+        G["GoPhish"]
+  end
+ subgraph subGraph2["🎯 Target Net (Vulnerable Apps)"]
+        D["DVWA & JuiceShop"]
+        L["Vulnerable LLM App"]
+        R["Vulnerable RAG App"]
+  end
+ subgraph subGraph3["🤖 AI Native (GPU Hardware)"]
+        O["Ollama Server - RTX 5060"]
+  end
+ subgraph subGraph4["🖥️ Local Machine (Windows 11 + WSL2/Docker)"]
+        subGraph0
+        subGraph1
+        subGraph2
+        subGraph3
+  end
+ subgraph subGraph5["☁️ GCP Environment"]
+        IAP["GCP IAP Tunnel"]
+        S["Splunk Enterprise"]
+        AD["Windows AD DC"]
+        WC["Windows Client"]
+  end
+    K -- Attacks --> D & L & R
+    A -- Queries --> O
+    L -- Uses --> O
+    R -- Uses --> O
+    SysmonLocal -. System Logs .-> W
+    W -. Monitors .-> D & L & R
+    W == JSON Alerts ==> IAP
+    IAP == To HEC:8088 ==> S
+    AD == WinEventLog ==> S
+    WC == Sysmon ==> S
+    C -. Automated APT .-> AD & WC
+    G -. Phishing Emails .-> WC
 ```
 
 ### Splunk Logging & Connectivity Architecture
