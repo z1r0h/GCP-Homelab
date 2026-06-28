@@ -6,7 +6,7 @@
 
 This project serves as a submodule to the existing `GCP-Homelab` repository, focusing entirely on the intersection of Artificial Intelligence and Cybersecurity. 
 
-As the AI arms race escalates between attackers and defenders, this lab provides 20 hands-on scenarios to study:
+As the AI arms race escalates between attackers and defenders, this lab provides 23 hands-on scenarios to study:
 - **Offensive AI**: How attackers use LLMs for automated pentesting, deepfakes, phishing, and malware creation.
 - **Defensive AI**: How defenders utilize AI for anomaly detection, automated SOC analysis, and SOAR.
 - **AI/ML Vulnerabilities**: Securing AI systems themselves against Prompt Injection, Model Extraction, and RAG Poisoning.
@@ -107,15 +107,19 @@ This lab integrates cutting-edge AI and enterprise-grade security tools:
 
 ### 🔴 Offense (Red Team)
 - **Kali Linux**: The primary attacker machine equipped with pentesting tools.
+- **CALDERA**: MITRE's autonomous adversary-emulation platform — chains ATT&CK techniques (discovery, privilege escalation, lateral movement) with no human input. Drives scenarios 01, 20, and 22.
 - **GoPhish**: An open-source phishing framework used to simulate AI-generated social engineering campaigns.
 
 ### 🎯 Target (Vulnerable Applications)
 - **llm-app**: A vulnerable Python Flask chatbot susceptible to Prompt Injection.
-- **rag-app**: A Retrieval-Augmented Generation application vulnerable to Data Poisoning via ChromaDB.
+- **rag-app**: A Retrieval-Augmented Generation application vulnerable to Data Poisoning via its file-based knowledge base.
 - **agent-app**: An AI agent suffering from Excessive Agency, allowing unauthorized OS command execution.
+- **ml-api**: A model endpoint that leaks full-precision confidence scores — the target for Model Extraction (08) and Adversarial ML Evasion (05).
+- **DVWA & Juice Shop**: Classic, vulnerability-rich web targets used as a realistic attack surface for the AI pentest agent (21) and for generating training traffic for anomaly detection (23).
 
 ### 🛡️ Defense (Blue Team)
-- **Wazuh (EDR/SIEM)**: Acts as the local security agent and log aggregator, collecting Docker and system logs to forward them to the cloud.
+- **Wazuh (EDR/SIEM)**: Acts as the local security agent and log aggregator, collecting app and system logs (via a shared `ai-logs` volume) and forwarding alerts to the cloud.
+- **AI SOC Analyst Script**: `scripts/ai_soc_triage.py` — feeds Wazuh alerts to the local LLM for True/False-Positive triage and MITRE mapping, then forwards verdicts to Splunk.
 - **Sysmon**: Advanced Windows system monitor configured to detect AI-generated malware behaviors (e.g., suspicious Python/PowerShell executions).
 - **Splunk Enterprise**: The central Cloud SIEM hosted on GCP for advanced SPL threat hunting and log correlation.
 
@@ -129,47 +133,56 @@ This lab integrates cutting-edge AI and enterprise-grade security tools:
 ## 📂 Repository Structure
 
 ```text
-AI-Security-Lab/
+cyber-ai-lab/
 ├── README.md                           # Main dashboard & project overview
 ├── docs/                               # Scenario guides & syllabus
-│   ├── SCENARIOS_GUIDE.md              # Master syllabus & SOP
-│   └── scenarios/                      # 20 Super Detailed HTB-style Guides
+│   ├── SCENARIOS_GUIDE.md              # Master syllabus, SOP & 23-scenario index
+│   └── scenarios/                      # 23 Super Detailed HTB-style Guides
 │       ├── 01-AI-Autonomous-Pentesting-Agent.md
 │       ├── 02-AI-Powered-Phishing-&-Social-Engineering.md
-│       └── ... (20 detailed guides)
+│       └── ... (23 detailed guides)
 │
 ├── infrastructure/                     # Environment configurations & setup
 │   ├── LOCAL_MACHINE_SETUP.md          # Hardware & Docker configuration
 │   ├── SPLUNK_SETUP.md                 # GCP Splunk HEC & App setup
-│   ├── configs/                        # Wazuh, Splunk, Sysmon configs
-│   └── docker-compose.yml              # (Planned) Main docker environment
+│   ├── configs/                        # Wazuh & Sysmon configs
+│   └── docker-compose.yml              # Main docker environment (profiles: defense/targets/offense/all)
 │
 ├── apps/                               # Vulnerable applications source code
-│   ├── rag-app/
-│   ├── llm-app/
-│   ├── agent-app/
-│   └── ml-notebooks/
+│   ├── llm-app/                        # Prompt Injection target (5002)
+│   ├── rag-app/                        # RAG Poisoning target (5001)
+│   ├── agent-app/                      # Excessive Agency target (5003)
+│   ├── ml-api/                         # Model Extraction / Adversarial ML target (5005)
+│   └── ml-notebooks/                   # Jupyter notebooks for ML scenarios
 │
 ├── detection-rules/                    # Detection Engineering as Code (DaC)
 │   ├── splunk/                         # SPL queries (.spl)
-│   ├── wazuh/                          # Custom decoders & rules (.xml)
-│   └── sigma/                          # Sigma rules (.yaml)
+│   ├── wazuh/                          # Custom rules (.xml)
+│   └── sigma/                          # Sigma rules (.yml)
 │
 ├── scenarios/                          # Individual scenario workspaces
 │   ├── 01-ai-autonomous-pentest/
 │   │   ├── README.md                   # Specific Scenario Report Template
 │   │   └── evidence/                   # Screenshots & logs
 │   ├── 02-ai-phishing/
-│   └── ... (20 scenario folders)
+│   └── ... (23 scenario folders)
 │
-└── scripts/                            # Automation scripts
-    ├── start_lab.ps1                   # Interactive menu to start lab
-    └── verify_health.ps1               # Connection health check
+├── scripts/                            # Blue-team & lab automation
+│   ├── start_lab.ps1                   # Interactive menu to start lab
+│   ├── verify_health.ps1               # Connection health check
+│   ├── ai_soc_triage.py                # AI SOC alert triage (scenario 10)
+│   ├── soar_playbook.py                # AI SOAR auto-response (scenario 14)
+│   └── nl_to_spl.py                    # Natural-language-to-SPL middleware (scenario 12)
+│
+└── tools/                              # Red-team offensive automation
+    ├── ai_pentest_agent.py             # LLM-driven autonomous pentest (scenarios 01, 21)
+    ├── model_extractor.py              # Model extraction attack (scenario 08)
+    └── generate_adv_samples.py         # ZOO adversarial evasion (scenario 05)
 ```
 
 ---
 
-## 📋 Scenario Matrix (20 Scenarios)
+## 📋 Scenario Matrix (23 Scenarios)
 
 > **Status Key:** 
 > ⚪ PLANNED (Not started)
@@ -197,6 +210,9 @@ AI-Security-Lab/
 | 18 | MFA Bypass & Credential Attacks + AI | 🟣 Both | ATT&CK T1556, T1110 | ⚪ PLANNED |
 | 19 | LLM Misinformation & Hallucination Defense| 🟣 Both | OWASP LLM09 | ⚪ PLANNED |
 | 20 | AI vs AI Final Exercise | 🟣 Both | ALL Frameworks | ⚪ PLANNED |
+| 21 | AI-Driven Web Pentest (Juice Shop) | 🔴 Offense | ATT&CK T1595/T1190, ATLAS AML.T0016 | ⚪ PLANNED |
+| 22 | CALDERA Autonomous Red vs AI Blue | 🟣 Both | ATT&CK (Full Chain) | ⚪ PLANNED |
+| 23 | Real-Traffic AI Anomaly Detection Training | 🔵 Defense | ATT&CK TA0008/TA0010, OWASP LLM04 | ⚪ PLANNED |
 
 ## ⚠️ Disclaimer
 
