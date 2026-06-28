@@ -1,6 +1,6 @@
 # GCP Homelab
 
-A hands-on home lab hosted on **Google Cloud Platform (GCP)**, built to develop practical blue-team and detection-engineering skills for a SOC Analyst role.
+A hands-on home lab hosted on **Google Cloud Platform (GCP)** and local machines, built to develop practical blue-team and detection-engineering skills for a SOC Analyst role.
 
 This repo is an umbrella for several labs. Each lab has its own folder with setup notes, configs, and detection work. It is an active, ongoing project — sections are marked with their current status.
 
