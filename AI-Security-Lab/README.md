@@ -1,6 +1,6 @@
 # 🛡️ Cyber AI Lab — AI-Powered Cybersecurity Attack & Defense Laboratory
 
-> A comprehensive local and cloud-hybrid homelab for simulating real-world AI-driven cybersecurity scenarios, designed specifically to develop practical blue-team, red-team, and detection engineering skills.
+> A fully GCP-hosted homelab for simulating real-world AI-driven cybersecurity scenarios, designed specifically to develop practical blue-team, red-team, and detection engineering skills.
 
 ## 🎯 Project Overview
 
@@ -15,7 +15,7 @@ As the AI arms race escalates between attackers and defenders, this lab provides
 
 ## 🏗️ Lab Infrastructure & Architecture
 
-The lab utilizes a hybrid architecture, prioritizing local execution for heavy AI tasks (GPU utilization) while keeping SIEM logging in the cloud (GCP).
+The lab runs entirely on a **GCP Spot VM** (NVIDIA T4 GPU) in the **same VPC** as the Splunk SIEM, so log forwarding (Wazuh → Splunk HEC) goes directly over the private network — no tunnel needed.
 
 ### Overall Architecture
 
@@ -29,7 +29,6 @@ flowchart LR
  subgraph subGraph0["🔵 Blue Net (Defense)"]
         W["Wazuh SIEM"]
         A["AI SOC Analyst Script"]
-        SysmonLocal["Local Sysmon"]
   end
  subgraph subGraph1["🔴 Red Net (Attack)"]
         K["Kali Linux"]
@@ -42,16 +41,16 @@ flowchart LR
         R["Vulnerable RAG App"]
   end
  subgraph subGraph3["🤖 AI Native (GPU Hardware)"]
-        O["Ollama Server - RTX 5060"]
+        O["Ollama Server - T4 GPU"]
   end
- subgraph subGraph4["🖥️ Local Machine (Windows 11 + WSL2/Docker)"]
+ subgraph subGraph4["☁️ GCP Spot VM (Ubuntu + T4 GPU, Docker)"]
         subGraph0
         subGraph1
         subGraph2
         subGraph3
   end
  subgraph subGraph5["☁️ GCP Environment"]
-        IAP["GCP IAP Tunnel"]
+        IAP["GCP IAP (admin SSH + Splunk Web)"]
         S["Splunk Enterprise"]
         AD["Windows AD DC"]
         WC["Windows Client"]
@@ -60,10 +59,9 @@ flowchart LR
     A -- Queries --> O
     L -- Uses --> O
     R -- Uses --> O
-    SysmonLocal -. System Logs .-> W
     W -. Monitors .-> D & L & R
-    W == JSON Alerts ==> IAP
-    IAP == To HEC:8088 ==> S
+    W == "JSON Alerts (VPC internal :8088)" ==> S
+    IAP -. admin access .-> S
     AD == WinEventLog ==> S
     WC == Sysmon ==> S
     C -. Automated APT .-> AD & WC
@@ -72,7 +70,7 @@ flowchart LR
 
 ### Splunk Logging & Connectivity Architecture
 
-To securely transmit logs from the local lab to GCP without exposing Splunk to the public internet, the lab uses GCP IAP (Identity-Aware Proxy) Tunnels and Splunk HEC (HTTP Event Collector).
+Because the lab VM and Splunk are in the **same VPC**, log forwarding (HEC) goes directly over the private network — no tunnel. GCP IAP is used only for the analyst to reach the lab VM (SSH) and the Splunk Web UI from an external machine.
 
 ```mermaid
 ---
@@ -82,21 +80,19 @@ config:
   fontFamily: '''Merriweather Variable'', serif'
 ---
 sequenceDiagram
-    participant Docker as Local Docker (Wazuh/Apps)
-    participant IAP as GCP IAP Tunnel (Localhost:8088)
+    participant Docker as Lab VM Docker (Wazuh/Apps)
     participant HEC as Splunk HEC (GCP VM:8088)
     participant Splunk as Splunk Indexer (GCP)
-    Note over Docker, Splunk: Log Ingestion Pipeline
-    Docker->>IAP: 1. Send JSON log via HTTP POST (localhost:8088)
-    IAP->>HEC: 2. Securely tunnel traffic to GCP internal IP
-    HEC->>Splunk: 3. Authenticate via Token & Ingest to Index
-    participant Analyst as SOC Analyst (Browser)
+    Note over Docker, Splunk: Log Ingestion Pipeline (VPC internal, no tunnel)
+    Docker->>HEC: 1. POST JSON alert to Splunk internal IP:8088 (Wazuh_Token)
+    HEC->>Splunk: 2. Authenticate via Token & ingest to index=ai_logs
+    participant Analyst as SOC Analyst (work PC)
     participant IAPWeb as GCP IAP Tunnel (Localhost:8000)
     participant Web as Splunk Web (GCP VM:8000)
-    Note over Analyst, Web: Analysis Pipeline
-    Analyst->>IAPWeb: 4. Access Splunk UI (https://localhost:8000)
-    IAPWeb->>Web: 5. Securely tunnel UI traffic
-    Web->>Analyst: 6. Render Dashboards & SPL Results
+    Note over Analyst, Web: Analysis Pipeline (IAP from outside)
+    Analyst->>IAPWeb: 3. Access Splunk UI (https://localhost:8000)
+    IAPWeb->>Web: 4. Securely tunnel UI traffic
+    Web->>Analyst: 5. Render Dashboards & SPL Results
 ```
 
 ---
@@ -118,35 +114,38 @@ This lab integrates cutting-edge AI and enterprise-grade security tools:
 - **DVWA & Juice Shop**: Classic, vulnerability-rich web targets used as a realistic attack surface for the AI pentest agent (21) and for generating training traffic for anomaly detection (23).
 
 ### 🛡️ Defense (Blue Team)
-- **Wazuh (EDR/SIEM)**: Acts as the local security agent and log aggregator, collecting app and system logs (via a shared `ai-logs` volume) and forwarding alerts to the cloud.
+- **Wazuh (EDR/SIEM)**: The lab VM's security agent and log aggregator, collecting app logs (via a shared `ai-logs` volume) and forwarding alerts to Splunk over the **VPC-internal network**.
 - **AI SOC Analyst Script**: `scripts/ai_soc_triage.py` — feeds Wazuh alerts to the local LLM for True/False-Positive triage and MITRE mapping, then forwards verdicts to Splunk.
-- **Sysmon**: Advanced Windows system monitor configured to detect AI-generated malware behaviors (e.g., suspicious Python/PowerShell executions).
-- **Splunk Enterprise**: The central Cloud SIEM hosted on GCP for advanced SPL threat hunting and log correlation.
+- **Sysmon**: Advanced Windows system monitor (deployed on the GCP Windows AD/Client VMs) running [olafhartong/sysmon-modular](https://github.com/olafhartong/sysmon-modular)'s balanced config — an industry-standard, MITRE ATT&CK-tagged ruleset — with an ingest-time filter on Splunk to keep the noisiest event type (ImageLoad) from blowing the 10GB/day license.
+- **Splunk Enterprise**: The central SIEM on a GCP VM (same VPC) for advanced SPL threat hunting and log correlation.
 
 ### 🤖 AI Backend & Cloud Infrastructure
-- **Ollama**: Local AI inference engine utilizing an NVIDIA RTX 5060 GPU to run `llama3.1` and `codellama` entirely offline.
-- **GCP IAP Tunnels**: Secures the connection between the local lab and GCP without exposing public IP addresses.
-- **Splunk HEC (HTTP Event Collector)**: Ingests structured JSON alerts generated by Wazuh over port 8088.
+- **Ollama**: AI inference engine utilizing the lab VM's **NVIDIA T4 GPU (16GB)** to run `llama3.1` and `codellama` entirely offline.
+- **GCP Spot VM**: A preemptible n1-standard-8 + T4 instance running the full Docker stack; cheap (60-70% off) and stoppable between sessions.
+- **GCP IAP**: Used for admin access only — SSH to the lab VM and reaching Splunk Web — without any public IP. Log forwarding is VPC-internal, not via IAP.
+- **Splunk HEC (HTTP Event Collector)**: Ingests structured JSON alerts from Wazuh over the VPC-internal network on port 8088.
 
 ---
 
 ## 📂 Repository Structure
 
 ```text
-cyber-ai-lab/
+gcp-cyber-ai-lab/
 ├── README.md                           # Main dashboard & project overview
-├── docs/                               # Scenario guides & syllabus
+├── docs/                               # Scenario guides, setup & syllabus
 │   ├── SCENARIOS_GUIDE.md              # Master syllabus, SOP & 23-scenario index
+│   ├── setup/                          # 00-13 from-scratch GCP setup (VPC→firewall→NAT→4 VMs→config→ignite→snapshot→cost)
 │   └── scenarios/                      # 23 Super Detailed HTB-style Guides
 │       ├── 01-AI-Autonomous-Pentesting-Agent.md
 │       ├── 02-AI-Powered-Phishing-&-Social-Engineering.md
 │       └── ... (23 detailed guides)
 │
 ├── infrastructure/                     # Environment configurations & setup
-│   ├── LOCAL_MACHINE_SETUP.md          # Hardware & Docker configuration
-│   ├── SPLUNK_SETUP.md                 # GCP Splunk HEC & App setup
+│   ├── LOCAL_MACHINE_SETUP.md          # GCP lab VM setup (specs, install, networks)
+│   ├── SPLUNK_SETUP.md                 # GCP Splunk HEC, indexes & VPC access
 │   ├── configs/                        # Wazuh & Sysmon configs
-│   └── docker-compose.yml              # Main docker environment (profiles: defense/targets/offense/all)
+│   ├── kali/                           # Kali attacker image (Dockerfile bakes in nmap/sqlmap/hydra/…)
+│   └── docker-compose.yml              # Main docker environment (profiles: defense/targets/offense/ml/all)
 │
 ├── apps/                               # Vulnerable applications source code
 │   ├── llm-app/                        # Prompt Injection target (5002)
@@ -168,8 +167,9 @@ cyber-ai-lab/
 │   └── ... (23 scenario folders)
 │
 ├── scripts/                            # Blue-team & lab automation
-│   ├── start_lab.ps1                   # Interactive menu to start lab
-│   ├── verify_health.ps1               # Connection health check
+│   ├── start_lab.sh                    # Interactive menu to start lab (bash)
+│   ├── verify_health.sh                # Connection health check (bash)
+│   ├── recover_vm.sh                   # One-command VM restore from baseline snapshot (bash)
 │   ├── ai_soc_triage.py                # AI SOC alert triage (scenario 10)
 │   ├── soar_playbook.py                # AI SOAR auto-response (scenario 14)
 │   └── nl_to_spl.py                    # Natural-language-to-SPL middleware (scenario 12)
