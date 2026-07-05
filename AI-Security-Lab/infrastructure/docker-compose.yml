@@ -1,0 +1,219 @@
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  # --- DEFENSE LAYER ---
+  wazuh-manager:
+    image: wazuh/wazuh-manager:4.7.3
+    hostname: wazuh-manager
+    ports:
+      - "1514:1514/udp" # Agent connection
+      - "55000:55000"   # API
+    volumes:
+      - ../infrastructure/configs/wazuh/ossec.conf:/var/ossec/etc/ossec.conf
+      - ../detection-rules/wazuh/custom_ai_rules.xml:/var/ossec/etc/rules/local_rules.xml
+      - ../infrastructure/configs/wazuh/custom-splunk-hec:/var/ossec/integrations/custom-splunk-hec
+      # Shared volume: apps write clean single-layer JSON here, Wazuh reads it directly.
+      # This bypasses Docker's double-JSON wrapping problem entirely.
+      - ai-logs:/var/log/ai-lab:ro
+    networks:
+      - blue-net
+      - target-net
+    # GCP edition: Wazuh forwards to Splunk's VPC-internal IP directly (set in ossec.conf
+    # hook_url). No IAP tunnel / host.docker.internal needed, so no extra_hosts here.
+    profiles: ["defense", "all"]
+    logging: *default-logging
+
+  # --- OFFENSE LAYER ---
+  # Kali is built from ../infrastructure/kali (stock kali-rolling has no tools installed);
+  # the Dockerfile bakes in nmap/sqlmap/hydra/nc/iodine/whatweb/python3 etc.
+  kali:
+    build: ../infrastructure/kali
+    hostname: kali-attacker
+    networks:
+      - red-net
+      - target-net
+    profiles: ["offense", "all"]
+    logging: *default-logging
+    labels:
+      - "ai.lab.role=offense"
+
+  gophish:
+    image: gophish/gophish
+    ports:
+      - "3333:3333" # Admin
+      - "8080:80"   # Phishing server
+    networks:
+      - red-net
+    profiles: ["offense", "all"]
+
+  # CALDERA — MITRE autonomous adversary emulation (scenarios 01, 20, 22).
+  # NOTE: CALDERA has no official Docker Hub image. Clone & build from source first:
+  #   git clone https://github.com/mitre/caldera.git --recursive ../external/caldera
+  # The build context below points at that clone. Until cloned, the `offense` profile
+  # will fail to build caldera — start it on its own once the source is in place.
+  caldera:
+    build:
+      context: ../external/caldera
+    hostname: caldera
+    ports:
+      - "8888:8888" # CALDERA web UI / API
+    networks:
+      - red-net
+      - target-net   # needs reach into targets to deploy sandcat agents
+    profiles: ["offense", "all"]
+    logging: *default-logging
+    labels:
+      - "ai.lab.role=offense"
+      - "ai.lab.scenario=22-caldera-vs-ai-blue"
+
+  # --- TARGET APPS LAYER ---
+  # Each app writes structured JSON logs to TWO places:
+  #   1. stdout (for `docker logs` debugging — wrapped by Docker in double JSON)
+  #   2. /var/log/ai-lab/<app>.json (clean single-layer JSON — read by Wazuh)
+  llm-vuln-app:
+    build: ../apps/llm-app
+    ports:
+      - "5002:5002"
+    volumes:
+      - ai-logs:/var/log/ai-lab
+    networks:
+      - target-net
+      - ai-net
+    profiles: ["targets", "all"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging: *default-logging
+    labels:
+      - "ai.lab.role=target"
+      - "ai.lab.scenario=03-prompt-injection"
+
+  rag-vuln-app:
+    build: ../apps/rag-app
+    ports:
+      - "5001:5001"
+    volumes:
+      - ai-logs:/var/log/ai-lab
+      - ../apps/rag-app/knowledge_base:/app/knowledge_base  # Persist KB for poisoning
+    networks:
+      - target-net
+      - ai-net
+    profiles: ["targets", "all"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging: *default-logging
+    labels:
+      - "ai.lab.role=target"
+      - "ai.lab.scenario=04-rag-poisoning"
+
+  agent-vuln-app:
+    build: ../apps/agent-app
+    ports:
+      - "5003:5003"
+    volumes:
+      - ai-logs:/var/log/ai-lab
+    networks:
+      - target-net
+      - ai-net
+    profiles: ["targets", "all"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging: *default-logging
+    labels:
+      - "ai.lab.role=target"
+      - "ai.lab.scenario=07-agentic-hijacking"
+
+  # --- CLASSIC WEB TARGETS (for AI-driven web pentest & realistic attack traffic) ---
+  # DVWA & Juice Shop give the AI pentest agent (scenario 21) and anomaly-detection
+  # training (scenario 23) real OWASP Top 10 vulnerabilities to discover.
+  dvwa:
+    image: vulnerables/web-dvwa
+    ports:
+      - "8081:80"
+    networks:
+      - target-net
+    profiles: ["targets", "all"]
+    logging: *default-logging
+    labels:
+      - "ai.lab.role=target"
+      - "ai.lab.scenario=23-real-traffic-anomaly"
+
+  juice-shop:
+    image: bkimminich/juice-shop
+    ports:
+      - "3000:3000"
+    networks:
+      - target-net
+    profiles: ["targets", "all"]
+    logging: *default-logging
+    labels:
+      - "ai.lab.role=target"
+      - "ai.lab.scenario=21-ai-web-pentest"
+
+  # ML model target API — serves a trained classifier with confidence scores.
+  # Target for Model Extraction (scenario 08) and Adversarial ML Evasion (scenario 05).
+  target-ml-api:
+    build: ../apps/ml-api
+    ports:
+      - "5005:5005"
+    networks:
+      - target-net
+      - ai-net
+    profiles: ["targets", "all"]
+    logging: *default-logging
+    labels:
+      - "ai.lab.role=target"
+      - "ai.lab.scenario=08-model-extraction"
+
+  # --- ML WORKBENCH ---
+  # Jupyter Lab for the ML scenarios (11 anomaly detection, 16 data poisoning, 23 retrain).
+  # Mounts apps/ml-notebooks so notebooks + outputs persist on the host. Own `ml` profile
+  # so it only starts when needed. Open http://localhost:8889 with token "cyberlab".
+  jupyter-ml-lab:
+    image: jupyter/scipy-notebook:latest
+    ports:
+      - "8889:8888"   # 8888 is taken by CALDERA, so publish Jupyter on 8889
+    environment:
+      - JUPYTER_TOKEN=cyberlab
+      - SPLUNK_HEC=${SPLUNK_HEC:-}
+      - SPLUNK_TOKEN=${SPLUNK_TOKEN:-}
+    volumes:
+      - ../apps/ml-notebooks:/home/jovyan/work
+    networks:
+      - target-net
+      - ai-net
+    profiles: ["ml", "all"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging: *default-logging
+    labels:
+      - "ai.lab.role=ml"
+      - "ai.lab.scenario=11-anomaly-detection"
+
+volumes:
+  ai-logs:  # Shared named volume: apps write, Wazuh reads
+
+networks:
+  blue-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+  red-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.20.0/24
+  target-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.30.0/24
+  ai-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.40.0/24

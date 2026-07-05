@@ -1,0 +1,27 @@
+title: AI Prompt Injection Detection
+id: a1b2c3d4-e5f6-7890-1234-567890abcdef
+status: experimental
+description: Detects keywords commonly used in LLM Prompt Injection and Jailbreak attempts against AI applications.
+references:
+    - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+author: z1r0h
+date: 2026/06/28
+logsource:
+    category: application
+    product: custom_ai_app
+detection:
+    selection:
+        prompt|contains:
+            - 'ignore previous'
+            - 'system prompt'
+            - 'developer mode'
+            - 'bypass'
+            - 'base64'
+    condition: selection
+falsepositives:
+    - Security researchers testing the AI platform (requires correlation with IP).
+    - Legitimate users asking questions about "system prompts" in an educational context.
+level: high
+tags:
+    - attack.t1190
+    - owasp.llm01

@@ -1,0 +1,43 @@
+<!-- 
+    File: custom_ai_rules.xml
+    Description: Custom Wazuh rules to detect AI-specific attacks parsed from Docker JSON logs.
+    MITRE ATT&CK: T1190 (Exploit Public-Facing Application)
+    
+    NOTE: Docker wraps app stdout in {"log":"<escaped JSON>","stream":"stdout"}.
+    After Wazuh decodes the outer JSON, the inner 'log' field contains the app's
+    structured JSON as a string. Use wazuh-logtest to verify field extraction
+    before relying on these rules in production.
+-->
+<group name="ai_security, prompt_injection,">
+  
+  <!-- Level 3: Baseline — any access to AI app API endpoints -->
+  <rule id="100001" level="3">
+    <decoded_as>json</decoded_as>
+    <field name="endpoint" type="pcre2">/api/</field>
+    <description>AI application API endpoint accessed</description>
+  </rule>
+
+  <!-- Level 8: High — prompt contains injection keywords -->
+  <rule id="100002" level="8">
+    <if_sid>100001</if_sid>
+    <field name="prompt" type="pcre2">ignore previous|developer mode|system prompt|base64|bypass</field>
+    <description>HIGH: Possible LLM Prompt Injection Detected</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <group>attack, injection,</group>
+  </rule>
+
+  <!-- Level 10: Critical — agent executes a dangerous system command -->
+  <rule id="100003" level="10">
+    <decoded_as>json</decoded_as>
+    <field name="tool_invoked">SystemShell</field>
+    <field name="command" type="pcre2">/etc/passwd|/etc/shadow|rm -rf|wget|curl.*http|nc .*-e</field>
+    <description>CRITICAL: AI Agent executed a dangerous system command</description>
+    <mitre>
+      <id>T1059</id>
+    </mitre>
+    <group>attack, execution,</group>
+  </rule>
+
+</group>

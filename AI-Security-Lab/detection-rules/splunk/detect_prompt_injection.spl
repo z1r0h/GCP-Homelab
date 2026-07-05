@@ -1,0 +1,22 @@
+/*
+    Title: Detect AI Prompt Injection Attempts
+    Author: z1r0h
+    Date: 2026-06-28
+    Description: 
+        Searches AI application logs for common prompt injection and jailbreak 
+        keywords (e.g., "ignore previous instructions", "system prompt").
+    Reference: OWASP LLM01
+    MITRE ATT&CK: T1190 (Exploit Public-Facing Application)
+*/
+
+index=ai_logs sourcetype=_json 
+| search prompt="*ignore*previous*" OR prompt="*system prompt*" OR prompt="*Developer Mode*" OR prompt="*base64*decode*"
+| eval payload_length=len(prompt)
+| eval risk_score=case(
+    match(prompt, "(?i)ignore previous"), "High",
+    match(prompt, "(?i)system prompt"), "Critical",
+    match(prompt, "(?i)base64.*decode"), "High",
+    1=1, "Medium"
+)
+| table _time, src_ip, prompt, payload_length, risk_score, response
+| sort - risk_score

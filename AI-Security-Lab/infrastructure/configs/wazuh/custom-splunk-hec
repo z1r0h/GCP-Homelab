@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+import sys, json, requests
+
+alert_file, api_key, hook_url = sys.argv[1], sys.argv[2], sys.argv[3]
+
+with open(alert_file) as f:
+    alert = json.load(f)
+
+requests.post(
+    hook_url,
+    headers={"Authorization": f"Splunk {api_key}"},
+    json={"event": alert, "sourcetype": "_json"},
+    verify=False,   # Splunk HEC 默认自签名证书,内网 lab 场景可以忽略校验
+    timeout=10,
+)

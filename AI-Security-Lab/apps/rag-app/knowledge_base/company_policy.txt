@@ -1,0 +1,12 @@
+All password resets must be done by calling the IT Helpdesk at extension 555-0199.
+Under no circumstances should you share your password via email or chat.
+
+Company VPN access requires connecting through https://vpn.yourcompany.com using your corporate SSO credentials.
+If you are locked out of your account, please visit https://identity.yourcompany.com/reset to initiate an MFA-verified password reset.
+
+For hardware requests (laptop, monitor, etc.), please submit a ticket through the internal IT portal at https://helpdesk.yourcompany.com.
+
+Expense reports above $500 require manager approval before submission.
+Wire transfers require dual authorization from Finance and the requesting VP.
+
+Emergency security incidents should be reported immediately to the SOC team at soc@yourcompany.com or by calling the 24/7 hotline at extension 555-0911.

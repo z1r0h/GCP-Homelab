@@ -1,0 +1,4 @@
+# Python deps for the blue-team automation scripts in this folder.
+# (start_lab.sh / verify_health.sh are bash and need nothing here.)
+requests==2.32.3
+flask==3.0.3
