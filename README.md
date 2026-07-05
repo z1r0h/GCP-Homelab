@@ -13,32 +13,34 @@ This repo is an umbrella for several labs. Each lab has its own folder with setu
 | Lab | Focus | Status |
 |---|---|---|
 | [Cloud Security Threat Detection Homelab](./Cloud-security-threat-detection-homelab) | Splunk + Sysmon detection engineering on a GCP VPC | 🟢 Done |
-| [AI Security Lab](./AI-Security-Lab) | AI-powered attack & defense: 20 scenarios covering OWASP LLM Top 10, MITRE ATLAS, adversarial ML | 🟡 In progress |
+| [AI Security Lab](./AI-Security-Lab) | AI-powered attack & defense: 23 scenarios covering OWASP LLM Top 10, MITRE ATLAS, adversarial ML | 🟡 In progress |
 > More labs will be added to this repo over time.
 
 ---
 
 ### AI Security Lab
-A comprehensive hybrid lab focusing on the intersection of AI and Cybersecurity. It features 20 hands-on scenarios covering offensive AI, defensive AI, and AI/ML vulnerabilities, bridging local GPU-accelerated workloads with cloud-based SIEM analysis.
-Architecture
-A hybrid environment prioritizing local execution for heavy AI inference tasks (GPU utilization) while securely routing telemetry to the GCP Cloud SIEM via IAP Tunnels:
+A fully GCP-hosted lab focusing on the intersection of AI and Cybersecurity. It features 23 hands-on scenarios covering offensive AI, defensive AI, and AI/ML vulnerabilities, running entirely on a single GCP Spot VM in the same VPC as the Splunk SIEM.
+
+### Architecture
+Everything runs on one **GCP Spot VM** (NVIDIA T4 GPU, Docker) in the same VPC as Splunk, so log forwarding (Wazuh → Splunk HEC) goes **directly over the private network — no tunnel needed**. GCP IAP is used only for admin access (SSH to the lab VM, Splunk Web UI), never for the telemetry pipeline itself.
 
 | Component | Role |
 | :--- | :--- |
-| Kali Linux & GoPhish | Offensive toolkit for AI-powered attacks and social engineering (Red Net) |
-| Vulnerable AI Apps | Custom targets (llm-app, rag-app, agent-app) built to practice prompt injection, data poisoning, and more |
-| Ollama Server (RTX 5060) | Local AI backend running Llama 3 models entirely offline |
-| Wazuh & Sysmon | Local defense layer for EDR, endpoint monitoring, and log aggregation |
-| Splunk Enterprise (GCP) | Cloud SIEM for threat hunting, securely ingesting logs via GCP IAP & Splunk HEC |
+| Kali Linux, CALDERA & GoPhish | Offensive toolkit — manual pentesting, autonomous ATT&CK chains, and phishing simulation (Red Net) |
+| Vulnerable AI Apps | Custom targets (llm-app, rag-app, agent-app, ml-api) for prompt injection, data poisoning, excessive agency, and model extraction |
+| Ollama Server (GCP T4 GPU) | AI backend running Llama 3 / CodeLlama entirely offline, on the lab VM's GPU |
+| Wazuh & Sysmon | Endpoint/app log aggregation and detection, forwarding alerts to Splunk over the VPC-internal network |
+| Splunk Enterprise (GCP, same VPC) | Cloud SIEM for threat hunting, ingesting logs directly via Splunk HEC — no tunnel |
 
 ### What's built 🟡
-- 20 distinct hands-on scenarios spanning Offensive AI (autonomous pentesting), Defensive AI (SOC alert triage, SOAR), and AI Vulnerability Exploitation.
-- Custom-built vulnerable AI applications (llm-app, rag-app, agent-app).
-- Secure end-to-end telemetry pipeline routing Wazuh JSON alerts over GCP IAP Tunnels (port 8088) directly into Splunk HEC.
-- Splunk Web UI accessible securely via IAP Tunnels (port 8000) without exposing public IPs.
+- 23 distinct hands-on scenarios spanning Offensive AI (autonomous pentesting), Defensive AI (SOC alert triage, SOAR), and AI Vulnerability Exploitation.
+- Custom-built vulnerable AI applications (llm-app, rag-app, agent-app, ml-api).
+- Secure end-to-end telemetry pipeline routing Wazuh JSON alerts directly into Splunk HEC over the VPC-internal network (no tunnel).
+- Splunk Web UI accessible securely via a GCP IAP tunnel (port 8000) without exposing public IPs.
 - Lab scenarios mapped against MITRE ATT&CK, MITRE ATLAS, and OWASP LLM Top 10 frameworks.
-Tools & Tech
-Ollama (Llama 3 / CodeLlama) · Python · Docker · Wazuh · Sysmon · Splunk Enterprise · GCP IAP Tunnels · Kali Linux · GoPhish · MITRE ATLAS · OWASP LLM Top 10
+
+### Tools & Tech
+Ollama (Llama 3 / CodeLlama) · Python · Docker · Wazuh · Sysmon · Splunk Enterprise · GCP IAP · CALDERA · Kali Linux · GoPhish · MITRE ATLAS · OWASP LLM Top 10
 
 ---
 
