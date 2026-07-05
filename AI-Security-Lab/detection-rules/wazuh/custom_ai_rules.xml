@@ -9,10 +9,22 @@
     before relying on these rules in production.
 -->
 <group name="ai_security, prompt_injection,">
-  
+
+  <!-- Level 0: Base rule — fingerprints OUR app logs specifically via the "app" field.
+       Wazuh's generic "json" decoder is shared with other log sources (e.g. Suricata EVE
+       JSON also decodes as "json" and happens to have its own "event_type" field, which
+       collides with ours). Without a unique parent, 100001/100003 sat at the generic
+       category root and lost to Suricata's broader catch-all rule (86600) that matches
+       first. Chaining everything via <if_sid> off this rule avoids that collision. -->
+  <rule id="100000" level="0">
+    <decoded_as>json</decoded_as>
+    <field name="app">llm-app|rag-app|agent-app|ml-api</field>
+    <description>AI Security Lab application log</description>
+  </rule>
+
   <!-- Level 3: Baseline — any access to AI app API endpoints -->
   <rule id="100001" level="3">
-    <decoded_as>json</decoded_as>
+    <if_sid>100000</if_sid>
     <field name="endpoint" type="pcre2">/api/</field>
     <description>AI application API endpoint accessed</description>
   </rule>
@@ -30,7 +42,7 @@
 
   <!-- Level 10: Critical — agent executes a dangerous system command -->
   <rule id="100003" level="10">
-    <decoded_as>json</decoded_as>
+    <if_sid>100000</if_sid>
     <field name="tool_invoked">SystemShell</field>
     <field name="command" type="pcre2">/etc/passwd|/etc/shadow|rm -rf|wget|curl.*http|nc .*-e</field>
     <description>CRITICAL: AI Agent executed a dangerous system command</description>

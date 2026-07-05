@@ -10,7 +10,7 @@
 # lab VM(Spot,停机磁盘保留)
 gcloud compute instances stop cyber-ai-lab-vm --zone=asia-southeast1-a
 # 不做实验时 Splunk / Windows 也停(Splunk 停了就收不到日志,按需停)
-gcloud compute instances stop splunk-vm ad-dc-vm win-client-vm --zone=asia-southeast1-a
+gcloud compute instances stop splunk-server win-dc win-client --zone=asia-southeast1-a
 ```
 > 一条命令停多台:`gcloud compute instances stop A B C --zone=asia-southeast1-a`。
 > Spot 停机后磁盘保留,下次 `start` 即恢复(不用重建)。
@@ -49,8 +49,8 @@ gcloud compute instances start cyber-ai-lab-vm --zone=asia-southeast1-a
 | 资源 | 计费方式 | 粗估 |
 |------|---------|------|
 | `cyber-ai-lab-vm`(Spot n1-std-8+T4) | 用时计费 | ~$35-40/月 |
-| `splunk-vm`(e2-std-4) | 用时计费 | 看常驻时长 |
-| `ad-dc-vm` + `win-client-vm`(e2-std-2 ×2,含 Windows license) | 用时计费 | 仅做 17/18 时开,用完即停 |
+| `splunk-server`(e2-std-4) | 用时计费 | 看常驻时长 |
+| `win-dc` + `win-client`(e2-std-2 ×2,含 Windows license) | 用时计费 | 仅做 17/18 时开,用完即停 |
 | 4 块 pd-balanced 磁盘(lab 150GB + Splunk 100GB + Windows 80GB×2) | **常驻**计费 | ~$40-45/月(停机也算) |
 | Cloud NAT | 网关 + 流量 | 几美元/月 |
 

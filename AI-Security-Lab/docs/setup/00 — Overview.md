@@ -9,9 +9,9 @@
 | VM | 机型 | 角色 | 外网 IP | Tag |
 |----|------|------|:------:|-----|
 | `cyber-ai-lab-vm` | n1-standard-8 + T4 (Spot) | Docker 全栈 + Ollama(靶机/红队/蓝队容器都在这) | ❌ | `ai-lab` |
-| `splunk-vm` | e2-standard-4 | Splunk Enterprise(中央 SIEM + HEC) | ❌ | `splunk` |
-| `ad-dc-vm` | e2-standard-2 (Windows) | Active Directory 域控(场景 17/18) | ❌ | `windows` |
-| `win-client-vm` | e2-standard-2 (Windows) | 域内客户端 + Sysmon(场景 17/18) | ❌ | `windows` |
+| `splunk-server` | e2-standard-4 | Splunk Enterprise(中央 SIEM + HEC) | ❌ | `splunk` |
+| `win-dc` | e2-standard-2 (Windows) | Active Directory 域控(场景 17/18) | ❌ | `windows` |
+| `win-client` | e2-standard-2 (Windows) | 域内客户端 + Sysmon(场景 17/18) | ❌ | `windows` |
 
 > 全部 **无公网 IP**,纯靠 IAP(人)+ Cloud NAT(出网)+ VPC 内网(机器互联)。
 

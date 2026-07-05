@@ -100,9 +100,17 @@ ollama list
 
 ## 7.6 克隆代码
 
+> ⚠️ 用 `git archive` 而不是直接打包整个文件夹,除了"私密文件不会被打包"之外还有一个原因:
+> `git archive` 打包的是 **git 提交里存的内容**(纯 LF 换行),不是 Windows 工作目录里那份——
+> Windows 上 `core.autocrlf=true` 会让你本地看到的 `.sh` 文件显示成 CRLF 换行,如果直接拿 Windows
+> 磁盘上的文件夹打包(比如用 Explorer 压缩/`tar czf 整个目录`),`.sh` 脚本会带着 CRLF 传到 VM,
+> Linux 上跑起来直接报 `$'\r': command not found` / `syntax error`(踩过这个坑,見仓库根目录
+> `.gitattributes` 的说明)。**不要图省事把下面这条换成直接打包文件夹**,`git archive` 这条命令本身
+> 已经规避了这个问题,只要 `.sh`/`.py` 等文本文件在仓库里正常提交过就没事。
+
 ```bash
 ### ① 本地电脑(不是 VM):打包
-cd C:/Users/jerem/Desktop/gcp-cyber-ai-lab   # 进项目文件夹
+cd C:/ai-lab/GCP-Homelab/AI-Security-Lab    # 进项目文件夹(路径按你实际部署位置为准)
 git archive --format=tar -o lab.tar HEAD     # 把已 commit 的文件打包成 lab.tar（私密文件不会被打包）
 
 ### ② 本地电脑：传到 VM

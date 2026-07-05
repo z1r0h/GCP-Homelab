@@ -6,7 +6,7 @@
 
 ---
 
-## 9.1 提升域控(在 ad-dc-vm 上,PowerShell 管理员)
+## 9.1 提升域控(在 win-dc 上,PowerShell 管理员)
 
 ```powershell
 # 1. Reset local Administrator password (Optional)
@@ -27,7 +27,7 @@ New-ADUser -Name "joinuser" -SamAccountName "joinuser" `
 ```
 
 
-## 9.2 客户端入域(在 win-client-vm 上)
+## 9.2 客户端入域(在 win-client 上)
 
 ```powershell
 # 把 DNS 指向域控内网 IP(否则找不到域)
