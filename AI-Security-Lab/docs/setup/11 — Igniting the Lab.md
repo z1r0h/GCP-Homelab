@@ -15,6 +15,7 @@ CALDERA 无官方镜像,offense/all profile 从源码构建。只跑 defense/tar
 ## 11.2 (可选)装脚本依赖
 
 ```bash
+sudo apt install python3-pip
 pip install -r scripts/requirements.txt   # 蓝队 ai_soc_triage / soar_playbook / nl_to_spl
 pip install -r tools/requirements.txt     # 红队 ai_pentest_agent / model_extractor / generate_adv_samples
 ```
@@ -29,11 +30,23 @@ source ~/.bashrc
 
 ## 11.3a 修 Splunk HEC 集成脚本权限(`10.2a` 挂进来的那个文件)
 
+> ⚠️ **`root:wazuh` 这个组只存在于 wazuh-manager 容器里,宿主机(Ubuntu)上没有这个组**,直接在宿主机上 `chown root:wazuh` 会报
+> `invalid group`。Bind mount 只共享文件本身,不共享 `/etc/group` 的名字映射,所以必须**进容器里**做 chown/chmod
+> (容器里改的权限会直接体现在宿主机文件上,因为本质是同一个文件)。
+
 ```bash
-sudo chown root:wazuh infrastructure/configs/wazuh/custom-splunk-hec
-chmod 750 infrastructure/configs/wazuh/custom-splunk-hec
+# 1) 先确认 wazuh-manager 容器在跑;没起的话先单独启动这一个服务
+docker ps --filter name=wazuh-manager
+cd ~/cyber-ai-lab/infrastructure && docker compose --profile defense up -d wazuh-manager
+
+# 2) 进容器里做 chown/chmod
+docker exec -u root $(docker ps --filter name=wazuh-manager -q) chown root:wazuh /var/ossec/integrations/custom-splunk-hec
+docker exec -u root $(docker ps --filter name=wazuh-manager -q) chmod 750 /var/ossec/integrations/custom-splunk-hec
+
+# 3) 验证:应显示 -rwxr-x--- root wazuh
+docker exec $(docker ps --filter name=wazuh-manager -q) ls -l /var/ossec/integrations/custom-splunk-hec
 ```
-Wazuh 会检查这个脚本的属主/权限,不对就静默拒绝执行(不报错、日志里才看得出来),所以放在 `docker compose up` 之前做。
+Wazuh 每次调用这个脚本时都会检查属主/权限,不对就静默拒绝执行(不报错、日志里才看得出来)。
 
 ## 11.4 健康检查 + 点火
 

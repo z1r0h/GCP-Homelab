@@ -16,6 +16,8 @@ services:
       - ../infrastructure/configs/wazuh/ossec.conf:/var/ossec/etc/ossec.conf
       - ../detection-rules/wazuh/custom_ai_rules.xml:/var/ossec/etc/rules/local_rules.xml
       - ../infrastructure/configs/wazuh/custom-splunk-hec:/var/ossec/integrations/custom-splunk-hec
+      # wazuh-analysisd requires this file to exist even if Active Response isn't used (empty is fine).
+      - ../infrastructure/configs/wazuh/ar.conf:/var/ossec/etc/shared/ar.conf
       # Shared volume: apps write clean single-layer JSON here, Wazuh reads it directly.
       # This bypasses Docker's double-JSON wrapping problem entirely.
       - ai-logs:/var/log/ai-lab:ro
