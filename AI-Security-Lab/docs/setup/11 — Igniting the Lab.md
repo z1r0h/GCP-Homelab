@@ -16,6 +16,7 @@ CALDERA 无官方镜像,offense/all profile 从源码构建。只跑 defense/tar
 
 ```bash
 sudo apt install python3-pip
+sudo apt-get install -y nmap whatweb
 pip install -r scripts/requirements.txt   # 蓝队 ai_soc_triage / soar_playbook / nl_to_spl
 pip install -r tools/requirements.txt     # 红队 ai_pentest_agent / model_extractor / generate_adv_samples
 ```
