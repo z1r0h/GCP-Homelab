@@ -13,7 +13,7 @@ This repo is an umbrella for several labs. Each lab has its own folder with setu
 | Lab | Focus | Status |
 |---|---|---|
 | [Cloud Security Threat Detection Homelab](./Cloud-security-threat-detection-homelab) | Splunk + Sysmon detection engineering on a GCP VPC | 🟢 Done |
-| [AI Security Lab](./AI-Security-Lab) | AI-powered attack & defense: 23 scenarios covering OWASP LLM Top 10, MITRE ATLAS, adversarial ML | 🟡 In progress |
+| [AI Security Lab](./AI-Security-Lab) | AI-powered attack & defense: 23 scenarios covering OWASP LLM Top 10, MITRE ATLAS, adversarial ML | 🟡 In progress(Temp Pause for SEC+ exam prep |
 > More labs will be added to this repo over time.
 
 ---
