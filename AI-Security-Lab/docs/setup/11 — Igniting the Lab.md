@@ -73,12 +73,26 @@ bash scripts/start_lab.sh
 ```
 1. Defense Only (Wazuh)
 2. Target Apps (vuln LLMs + DVWA/Juice Shop/ml-api)
-3. Offense (Kali, GoPhish, CALDERA)
+3. Offense (Kali, GoPhish, Mailpit, CALDERA)
 4. ML Workbench (Jupyter Lab -> http://localhost:8889, token 'cyberlab')
 5. Start ALL
 6. Stop ALL
 ```
 首次启动会拉镜像 + 构建 CALDERA,约 10-15 分钟。按需用 profile 省内存。
+
+## 11.4a (仅场景 02 需要)首次获取 GoPhish API Key
+
+> 跟 CALDERA 源码不同,这一步**必须等 GoPhish 容器真的跑起来之后才能做**(要登录它的网页面板),
+> 所以放在点火之后,不是之前。
+
+1. 经 IAP 转发 3333 端口(见 `06` §6.4),浏览器开 `https://localhost:3333`(自签名证书,continue 过去)。
+2. 首次登录用容器日志里打印的初始密码:`docker logs $(docker ps --filter name=gophish -q) 2>&1 | grep -i password`,登录后会强制改密。
+3. 左侧 **Settings** → 生成 API Key,记下来:
+   ```bash
+   echo 'export GOPHISH_API_KEY="粘贴你的 Key"' >> ~/.bashrc
+   source ~/.bashrc
+   ```
+   (真实值也可以照 `credentials.md` 的模式存一份本地备份,不上传。)
 
 ## 11.5 验证检测闭环(点火后第一件事)
 

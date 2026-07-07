@@ -32,12 +32,21 @@ gcloud compute start-iap-tunnel splunk-server 8000 --local-host-port=localhost:8
 # 浏览器开 https://localhost:8000
 ```
 
-## 6.4 (可选)在浏览器看靶机
+## 6.4 在浏览器看靶机 / 红队工具面板
 
 比如看 Juice Shop(靶机端口不对外开放,用 IAP 转发到 lab VM):
 ```bash
 gcloud compute start-iap-tunnel cyber-ai-lab-vm 3000 --local-host-port=localhost:3000 --zone=asia-southeast1-a
 ```
+
+> ⚠️ **场景 02 必需,不是可选**:GoPhish 管理面板(登录+生成 API Key)和 Mailpit(点开钓鱼邮件、点链接)
+> 都只能从 lab VM 内网访问,同样需要转发才能在你自己电脑的浏览器打开:
+> ```bash
+> gcloud compute start-iap-tunnel cyber-ai-lab-vm 3333 --local-host-port=localhost:3333 --zone=asia-southeast1-a
+> # 浏览器开 https://localhost:3333(GoPhish,自签名证书会警告,继续访问即可)
+> gcloud compute start-iap-tunnel cyber-ai-lab-vm 8025 --local-host-port=localhost:8025 --zone=asia-southeast1-a
+> # 浏览器开 http://localhost:8025(Mailpit)
+> ```
 
 ---
 

@@ -65,7 +65,7 @@ gcloud compute routers nats list --router=security-lab-router --region=asia-sout
 ```
 应看到 3 条 IAP 规则 + 1 条 internal 规则 + 1 个 NAT。
 
-> 🔒 **安全检查**:此时**没有任何规则**对 `0.0.0.0/0` 开放入站。靶机端口(5001-5005/3000/8081/8888/3333)既不在防火墙里、VM 也无公网 IP——只能从 VM 内 `localhost` 或经 IAP 端口转发访问。
+> 🔒 **安全检查**:此时**没有任何规则**对 `0.0.0.0/0` 开放入站。靶机端口(5001-5005/3000/8025/8081/8888/3333)既不在防火墙里、VM 也无公网 IP——只能从 VM 内 `localhost` 或经 IAP 端口转发访问。
 
 ---
 

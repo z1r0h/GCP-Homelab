@@ -13,9 +13,14 @@ Traditional phishing often suffers from poor grammar or generic context. AI-gene
 1. SSH into the GCP lab VM via IAP and ensure Docker is running (`docker ps`).
 2. Execute the following command to prepare the target environment:
 ```bash
-docker compose up -d gophish
+docker compose -f infrastructure/docker-compose.yml up -d gophish mailpit
 ```
-3. Ensure Splunk HEC is receiving logs over the VPC-internal network.
+3. **One-time only**: log into GoPhish at `https://localhost:3333` (self-signed cert,
+   accept the browser warning), go to **Settings**, generate an API key, and:
+   ```bash
+   export GOPHISH_API_KEY="paste-the-key-here"
+   ```
+4. Ensure Splunk HEC is receiving logs over the VPC-internal network.
 
 ---
 
@@ -24,28 +29,40 @@ Follow these exact steps to simulate the attack.
 
 **Command:**
 ```bash
-curl http://localhost:11434/api/generate -d '{"model":"llama3.1:8b", "prompt":"Write a highly urgent phishing email from IT support about VPN deactivation..."}'
+python3 tools/phishing_campaign.py --launch
 ```
 
 **What is happening?**
-Generate the email payload and use the GoPhish dashboard on port 3333 to launch the campaign against simulated internal users.
+Ollama writes the phishing email, then the script creates (or reuses) the GoPhish
+sending profile/template/landing page/target group and launches a real campaign —
+sent via Mailpit rather than a real mail server, so nothing leaves the lab. The
+script then stops and hands off to **you**: open `http://localhost:8025` (Mailpit),
+read the email like the target would, and click the link inside it yourself. A
+script can't authentically play "the human who fell for it" — that part is on you.
+
+Once you've clicked it, pull the real results:
+```bash
+python3 tools/phishing_campaign.py --report <campaign_id>   # id printed by --launch
+```
+This forwards the real email content plus GoPhish's real `opened`/`clicked` counts
+to Splunk (`index=email_gateway`).
 
 **Expected Output:**
-You should see a successful execution or data exfiltration on your attacker terminal. **Take a screenshot and save it to the `evidence/` folder in the scenario directory.**
+`--launch` prints the generated email and a campaign ID. After you click the link
+in Mailpit, `--report` should show `clicked: 1` (and very likely `opened: 1` too —
+Mailpit's web UI doesn't block remote images/tracking pixels by default). **Take a
+screenshot of the email in Mailpit and the `--report` output, save to `evidence/`.**
 
 ---
 
 ## 🔵 4. Blue Team Walkthrough (Detection)
 Now that the attack has occurred, switch to your Splunk Web Interface (GCP IAP Tunnel).
 
-> ⚠️ **No live email feed in this lab.** There is no mail gateway forwarding to Splunk, so
-> `index=email_gateway` is empty by default. To exercise the SPL, inject a representative
-> sample event via HEC (use a token whose allowed-index list includes `email_gateway`):
-> ```bash
-> curl -k https://YOUR_SPLUNK_INTERNAL_IP:8088/services/collector \
->   -H "Authorization: Splunk YOUR_SPLUNK_HEC_TOKEN" \
->   -d '{"index":"email_gateway","sourcetype":"smtp","event":{"sender":"it-support@evil.com","subject":"URGENT: VPN deactivation","body":"Your VPN will be deactivated immediately — click https://evil.com/vpn to keep access"}}'
-> ```
+> ✅ **Real data, not a sample injection.** `tools/phishing_campaign.py --report` forwards
+> the actual GoPhish campaign — the real generated email content and the real
+> `opened`/`clicked` counts from you clicking the link in Mailpit — to
+> `index=email_gateway sourcetype=smtp` via Splunk HEC. Nothing below needs manual
+> sample data; run `--report` first if you haven't yet.
 
 1. Open `Apps -> Search & Reporting`.
 2. Set the Time Range to `Last 15 minutes` to filter out noise.

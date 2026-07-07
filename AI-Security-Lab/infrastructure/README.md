@@ -10,7 +10,7 @@ Uses **Docker Profiles** to manage memory on a 32GB machine:
 |---|---|---|
 | `defense` | `docker compose --profile defense up -d` | Wazuh Manager |
 | `targets` | `docker compose --profile targets up -d` | llm-vuln-app, rag-vuln-app, agent-vuln-app, target-ml-api, DVWA, Juice Shop |
-| `offense` | `docker compose --profile offense up -d` | Kali (built with tools†), GoPhish, CALDERA* |
+| `offense` | `docker compose --profile offense up -d` | Kali (built with tools†), GoPhish, Mailpit (fake SMTP for GoPhish), CALDERA* |
 | `ml` | `docker compose --profile ml up -d` | `jupyter-ml-lab` (Jupyter Lab → http://localhost:8889, token `cyberlab`) |
 | `all` | `docker compose --profile all up -d` | Everything |
 

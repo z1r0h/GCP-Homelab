@@ -52,6 +52,21 @@ services:
       - red-net
     profiles: ["offense", "all"]
 
+  # Mailpit — fake SMTP relay + inbox for GoPhish (scenario 02). MailHog is
+  # unmaintained since 2020; Mailpit is the maintained drop-in replacement.
+  # GoPhish sends to mailpit:1025; you read/click the email at :8025.
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025" # Web UI - open the phishing email and click its link here
+    networks:
+      - red-net
+    profiles: ["offense", "all"]
+    logging: *default-logging
+    labels:
+      - "ai.lab.role=offense"
+      - "ai.lab.scenario=02-ai-phishing"
+
   # CALDERA — MITRE autonomous adversary emulation (scenarios 01, 20, 22).
   # NOTE: CALDERA has no official Docker Hub image. Clone & build from source first:
   #   git clone https://github.com/mitre/caldera.git --recursive ../external/caldera

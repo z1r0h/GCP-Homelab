@@ -34,6 +34,7 @@ flowchart LR
         K["Kali Linux"]
         C["CALDERA"]
         G["GoPhish"]
+        MP["Mailpit (fake SMTP)"]
   end
  subgraph subGraph2["🎯 Target Net (Vulnerable Apps)"]
         D["DVWA & JuiceShop"]
@@ -65,7 +66,7 @@ flowchart LR
     AD == WinEventLog ==> S
     WC == Sysmon ==> S
     C -. Automated APT .-> AD & WC
-    G -. Phishing Emails .-> WC
+    G -. Phishing Emails .-> MP
 ```
 
 ### Splunk Logging & Connectivity Architecture
@@ -104,7 +105,7 @@ This lab integrates cutting-edge AI and enterprise-grade security tools:
 ### 🔴 Offense (Red Team)
 - **Kali Linux**: The primary attacker machine equipped with pentesting tools.
 - **CALDERA**: MITRE's autonomous adversary-emulation platform — chains ATT&CK techniques (discovery, privilege escalation, lateral movement) with no human input. Drives scenarios 01, 20, and 22.
-- **GoPhish**: An open-source phishing framework used to simulate AI-generated social engineering campaigns.
+- **GoPhish**: An open-source phishing framework used to simulate AI-generated social engineering campaigns (Scenario 02). `tools/phishing_campaign.py` drives it via its REST API, sending through **Mailpit** (a local fake SMTP catcher) so nothing leaves the lab.
 
 ### 🎯 Target (Vulnerable Applications)
 - **llm-app**: A vulnerable Python Flask chatbot susceptible to Prompt Injection.
@@ -176,6 +177,7 @@ gcp-cyber-ai-lab/
 │
 └── tools/                              # Red-team offensive automation
     ├── ai_pentest_agent.py             # LLM-driven autonomous pentest (scenarios 01, 21)
+    ├── phishing_campaign.py            # AI phishing email -> real GoPhish campaign via Mailpit (scenario 02)
     ├── model_extractor.py              # Model extraction attack (scenario 08)
     └── generate_adv_samples.py         # ZOO adversarial evasion (scenario 05)
 ```
